@@ -108,12 +108,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RiskDashboard\RiskDashboard.csproj">
-      <Project>{CFB3A09C-435E-412D-A12F-2FD95BCF87F7}</Project>
-      <Name>RiskDashboard</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
