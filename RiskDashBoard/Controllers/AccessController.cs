@@ -60,7 +60,7 @@ namespace RiskDashBoard.Controllers
                 var cryptedPassword = EncryptFunctions.Sha256Converter(userViewModel.Password);
                 var user = await _context.Users.FirstAsync(x => x.Password == cryptedPassword).ConfigureAwait(false);
 
-                if (user != null && user.UserId != 0)
+                if (user != null && user.UserId != 0 && !string.IsNullOrEmpty(user.UserName))
                 {
                     HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString(), user.UserName);
                     HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyId.ToString(), Guid.NewGuid().ToString());
