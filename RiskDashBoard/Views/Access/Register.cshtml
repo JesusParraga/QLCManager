@@ -52,6 +52,14 @@
 							</div>
 							<input type="password" name="ConfirmPassword" class="form-control input_pass" value="" placeholder="Confirm password">
 						</div>
+
+						@if (ViewData["message"] != null)
+						{
+							<div class="alert alert-danger" role="alert">
+								@ViewData["message"]
+							</div>
+						}
+
 						<div class="d-flex justify-content-center mt-3 login_container">
 							<button type="submit" name="button" class="btn login_btn">Create new user</button>
 						</div>

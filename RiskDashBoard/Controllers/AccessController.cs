@@ -29,26 +29,27 @@ namespace RiskDashBoard.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(UserViewModel userViewModel)
         {
-            if(!string.IsNullOrEmpty(userViewModel.Password) &&
-                !string.IsNullOrEmpty(userViewModel.ConfirmPassword) &&
-                userViewModel.Password == userViewModel.ConfirmPassword) {
-                userViewModel.Password = EncryptFunctions.Sha256Converter(userViewModel.ConfirmPassword);
-
-                if (ModelState.IsValid)
+            if (userViewModel.ValidateObjectProperties()) {
+                if (userViewModel.Password == userViewModel.ConfirmPassword)
                 {
-                    _context.Add(new User { UserName = userViewModel.UserName, Password = userViewModel.Password, Email = userViewModel.Email });
-                    await _context.SaveChangesAsync().ConfigureAwait(false);
-                    ViewData["Messaje"] = "User created properly";
-                    return RedirectToAction("Login", "Access");
-                }
+                    userViewModel.Password = EncryptFunctions.Sha256Converter(userViewModel.ConfirmPassword);
 
-                ViewData["Messaje"] = "You need to fill all the fields";
+                    if (await _context.Users.CountAsync(x => x.Email == userViewModel.Email).ConfigureAwait(false) == 0)
+                    {
+                        _context.Add(new User { UserName = userViewModel.UserName, Password = userViewModel.Password, Email = userViewModel.Email });
+                        await _context.SaveChangesAsync().ConfigureAwait(false);
+                        return RedirectToAction("Login", "Access");
+                    }
+                    ViewData["message"] = "This email is registerd in the system";           
+                }
+                else{
+                    ViewData["message"] = "Passwords are not equal";
+                }
             }
-            else
-            {
-                ViewData["Messaje"] = "Passwords are not equal";
+            else{
+				ViewData["message"] = "You need to fill all the fields";
             }
-            
+
             return View();
         }
 
@@ -69,7 +70,7 @@ namespace RiskDashBoard.Controllers
                 }
             }
 
-            ViewData["Messaje"] = "User or password not correct";
+            ViewData["message"] = "User or password not correct";
 
             return View();
         }

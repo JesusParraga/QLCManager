@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 
 namespace RiskDashBoard.Models.ViewModels
 {
@@ -15,5 +16,13 @@ namespace RiskDashBoard.Models.ViewModels
         public string? ConfirmPassword { get; set; }
 
         public ICollection<Project>? Projects { get; set; }
+
+        public bool ValidateObjectProperties()
+        {
+            return !string.IsNullOrEmpty(UserName) &&
+                !string.IsNullOrEmpty(Email) &&
+                !string.IsNullOrEmpty(Password) &&
+                !string.IsNullOrEmpty(ConfirmPassword);
+		}
     }
 }
