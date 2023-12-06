@@ -5,12 +5,12 @@ namespace RiskDashBoard.Models
     public class Phase
     {
         [Key]
-        public int ProjectPhaseId { get; set; }
+        public int PhaseId { get; set; }
         [Required]
-        public string? ProjectPhaseName { get; set;}
+        public string? PhaseName { get; set;}
        
         public int ProjectId { get; set; }
-        public Project? project { get; set; }
+        public virtual Project? Project { get; set; }
         public ICollection<Risk>? Risks { get;}
     }
 }

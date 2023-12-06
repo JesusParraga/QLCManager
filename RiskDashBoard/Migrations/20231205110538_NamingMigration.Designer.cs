@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RiskDashBoard.Context;
 
@@ -11,9 +12,11 @@ using RiskDashBoard.Context;
 namespace RiskDashBoard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231205110538_NamingMigration")]
+    partial class NamingMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,17 +27,17 @@ namespace RiskDashBoard.Migrations
 
             modelBuilder.Entity("PhaseRisk", b =>
                 {
-                    b.Property<int>("PhasesPhaseId")
+                    b.Property<int>("PhasesProjectPhaseId")
                         .HasColumnType("int");
 
                     b.Property<int>("RisksRiskId")
                         .HasColumnType("int");
 
-                    b.HasKey("PhasesPhaseId", "RisksRiskId");
+                    b.HasKey("PhasesProjectPhaseId", "RisksRiskId");
 
                     b.HasIndex("RisksRiskId");
 
-                    b.ToTable("PhaseRisk", (string)null);
+                    b.ToTable("ProjectPhaseRisk", (string)null);
                 });
 
             modelBuilder.Entity("ProjectUser", b =>
@@ -54,20 +57,20 @@ namespace RiskDashBoard.Migrations
 
             modelBuilder.Entity("RiskDashBoard.Models.Phase", b =>
                 {
-                    b.Property<int>("PhaseId")
+                    b.Property<int>("ProjectPhaseId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PhaseId"));
-
-                    b.Property<string>("PhaseName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectPhaseId"));
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.HasKey("PhaseId");
+                    b.Property<string>("ProjectPhaseName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ProjectPhaseId");
 
                     b.HasIndex("ProjectId");
 
@@ -185,7 +188,7 @@ namespace RiskDashBoard.Migrations
                 {
                     b.HasOne("RiskDashBoard.Models.Phase", null)
                         .WithMany()
-                        .HasForeignKey("PhasesPhaseId")
+                        .HasForeignKey("PhasesProjectPhaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -217,8 +220,7 @@ namespace RiskDashBoard.Migrations
                         .WithMany("Phases")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_ProjectPhase");
+                        .IsRequired();
 
                     b.Navigation("Project");
                 });

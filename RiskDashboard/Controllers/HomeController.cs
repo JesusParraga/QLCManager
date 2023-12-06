@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using RiskDashBoard.Models;
+using RiskDashBoard.Models.ViewModels;
 using System.Diagnostics;
 
 namespace RiskDashBoard.Controllers

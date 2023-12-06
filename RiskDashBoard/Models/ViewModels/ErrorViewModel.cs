@@ -1,4 +1,4 @@
-namespace RiskDashBoard.Models
+namespace RiskDashBoard.Models.ViewModels
 {
     public class ErrorViewModel
     {
