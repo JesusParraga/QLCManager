@@ -36,8 +36,8 @@ namespace RiskDashBoard.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    _context.Add(new User { UserName = userViewModel.UserName, Password = userViewModel.Password });
-                    await _context.SaveChangesAsync();
+                    _context.Add(new User { UserName = userViewModel.UserName, Password = userViewModel.Password, Email = userViewModel.Email });
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
                     ViewData["Messaje"] = "User created properly";
                     return RedirectToAction("Login", "Access");
                 }
@@ -58,7 +58,7 @@ namespace RiskDashBoard.Controllers
             if (!string.IsNullOrEmpty(userViewModel.Password))
             {
                 var cryptedPassword = EncryptFunctions.Sha256Converter(userViewModel.Password);
-                var user = await _context.Users.FirstAsync(x => x.Password == cryptedPassword).ConfigureAwait(false);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Password == cryptedPassword).ConfigureAwait(false);
 
                 if (user != null && user.UserId != 0 && !string.IsNullOrEmpty(user.UserName))
                 {
@@ -72,6 +72,14 @@ namespace RiskDashBoard.Controllers
             ViewData["Messaje"] = "User or password not correct";
 
             return View();
+        }
+
+        public ActionResult LogOut()
+        {
+            HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString(), string.Empty);
+            HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyId.ToString(), string.Empty);
+
+            return RedirectToAction("Login", "Access");
         }
     }
 }

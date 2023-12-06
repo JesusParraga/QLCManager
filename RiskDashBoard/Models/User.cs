@@ -10,7 +10,8 @@ namespace RiskDashBoard.Models
         public string? UserName { get; set; }
         [Required]
         public string? Password{ get; set; }
-        public string? Token { get; set; }
+        [Required]
+        public string? Email { get; set; }
 
         public ICollection<Project>? Projects { get; set; }
     }

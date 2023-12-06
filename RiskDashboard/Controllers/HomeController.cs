@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using RiskDashBoard.AccessRights;
 using RiskDashBoard.Models.ViewModels;
 using System.Diagnostics;
 
 namespace RiskDashBoard.Controllers
 {
+    [SessionValidation]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
