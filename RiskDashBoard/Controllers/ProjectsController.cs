@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RiskDashBoard.Context;
 using RiskDashBoard.Models;
+using RiskDashBoard.Models.ViewModels;
 
 namespace RiskDashBoard.Controllers
 {
@@ -81,12 +82,14 @@ namespace RiskDashBoard.Controllers
                 return NotFound();
             }
 
-            var project = await _context.Projects.FindAsync(id);
-            if (project == null)
+            var project = await _context.Projects.Include("Users").FirstOrDefaultAsync(x=> x.ProjectId == id);
+            
+           if(project != null)
             {
-                return NotFound();
+                return View(project);
             }
-            return View(project);
+            
+            return NotFound();        
         }
 
         // POST: Projects/Edit/5
@@ -155,6 +158,88 @@ namespace RiskDashBoard.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserProjectsPartial(int id)
+        {
+            var project = await _context.Projects.Include("Users").FirstOrDefaultAsync(x => x.ProjectId == id);
+            var userProjectViewModel = new List<UserProjectViewModel>();
+
+            if (project != null)
+            {
+                userProjectViewModel = await UsersByProject(project);
+            }
+
+            return PartialView("_ViewUserProject", userProjectViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveUserToTheProject (int idUser, int idProy)
+        {
+            var project = await _context.Projects.Include("Users").FirstOrDefaultAsync(x => x.ProjectId == idProy);
+            var userProjectViewModel = new List<UserProjectViewModel>();
+
+            if (project != null && project.Users != null) {
+                var userToRemove = project.Users.FirstOrDefault(x => x.UserId == idUser);              
+
+                if (userToRemove != null)
+                {
+                    project.Users.Remove(userToRemove);
+                    _context.Update(project);
+                    await _context.SaveChangesAsync();
+                }
+
+                userProjectViewModel = await UsersByProject(project);
+            }
+
+            return PartialView("_ViewUserProject", userProjectViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddUserToTheProject(int idUser, int idProy)
+        {
+            var project = await _context.Projects.Include("Users").FirstOrDefaultAsync(x => x.ProjectId == idProy);
+            var userProjectViewModel = new List<UserProjectViewModel>();
+
+            if (project != null && project.Users != null)
+            {
+                var userToAdd = _context.Users.FirstOrDefault(x => x.UserId == idUser);
+
+                if (userToAdd != null)
+                {
+                    project.Users.Add(userToAdd);
+                    _context.Update(project);
+                    await _context.SaveChangesAsync();
+                }
+
+                userProjectViewModel = await UsersByProject(project);
+            }
+
+            return PartialView("_ViewUserProject", userProjectViewModel);
+        }
+
+        private async Task<List<UserProjectViewModel>> UsersByProject(Project project)
+        {
+            List<UserProjectViewModel> userProjectViewModel = new List<UserProjectViewModel>();
+
+            var userList = await _context.Users.ToListAsync();
+
+            if (project != null && project.Users != null)
+            {
+                foreach (var user in userList)
+                {
+                    userProjectViewModel.Add(new UserProjectViewModel
+                    {
+                        projectId = project.ProjectId,
+                        UserId = user.UserId, 
+                        UserName = user.UserName,
+                        projectAsigned = project.Users.Any(x=> x.UserId == user.UserId)
+                    });
+                }
+            }
+
+            return userProjectViewModel;
         }
 
         private bool ProjectExists(int id)

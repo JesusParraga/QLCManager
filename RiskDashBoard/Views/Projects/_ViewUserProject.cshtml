@@ -1,0 +1,59 @@
+﻿@model List<RiskDashBoard.Models.ViewModels.UserProjectViewModel>
+
+<div class="row col-md-6 col-md-offset-2 custyle">
+    <table class="table table-striped custab">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th class="text-center">Action</th>
+            </tr>
+        </thead>
+        @if (Model != null)
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.UserName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                    <td class="text-center">
+                        @if (item.projectAsigned)
+                        {
+                            <button type="button" id="@item.UserId" onclick="RemoveUser(@item.UserId, @item.projectId)" style="margin-bottom:5px" class="btn btn-primary">Remove</button>
+                            @* <a asp-action="RemoveUserToTheProject" asp-route-idUser="@item.UserId" asp-route-idProy="@item.projectId" data-ajax="true" data-ajax-update="result"><i class="fa-solid fa-pencil"></i></a>*@      
+                        }                       
+                        else
+                        {
+                            <button type="button" id="@item.UserId" onclick="AddUser(@item.UserId, @item.projectId)" style="margin-bottom:5px" class="btn btn-primary">Add</button>
+                            @* <a asp-action="AddUserToTheProject" asp-route-idUser="@item.UserId" asp-route-idProy="@item.projectId"><i class="fa-solid fa-trash"></i></a> *@
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+</div>
+
+<script>
+    function RemoveUser(UserId, projectId) {
+        $.ajax({
+            url: "/Projects/RemoveUserToTheProject",
+            type: 'POST',
+            data: { idUser: UserId, idProy: projectId },
+            success: function (data) {
+                GetUserProjectsPartial()
+            }
+        });
+    };
+
+    function AddUser(UserId, projectId) {
+        $.ajax({
+            url: "/Projects/AddUserToTheProject",
+            type: 'POST',
+            data: { idUser: UserId, idProy: projectId },
+            success: function (data) {
+                GetUserProjectsPartial()
+            }
+        });
+    };
+</script>

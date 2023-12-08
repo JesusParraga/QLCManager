@@ -4,6 +4,7 @@
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<script src="https://kit.fontawesome.com/6efa2f4c47.js" crossorigin="anonymous"></script>
 
 <h1>Edit</h1>
 
@@ -37,9 +38,27 @@
 </div>
 
 <div>
+    <div id="ViewUserProject"></div>
+</div>
+
+<div>
     <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>$('#ViewUserProject').load("/Projects/GetUserProjectsPartial/@Model.ProjectId")</script>
+
+    <script>
+        function GetUserProjectsPartial() {
+            $.ajax({
+                url: "/Projects/GetUserProjectsPartial",
+                type: 'GET',
+                data: { id: @Model.ProjectId},
+                success: function (data) {
+                    jQuery("#ViewUserProject").html(data);
+                }
+            });
+        };        
+    </script>
 }
