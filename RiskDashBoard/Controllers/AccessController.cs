@@ -63,7 +63,7 @@ namespace RiskDashBoard.Controllers
 
                 if (user != null && user.UserId != 0 && !string.IsNullOrEmpty(user.UserName))
                 {
-                    HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString(), user.UserName);
+                    HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString(), user.UserId.ToString());
                     HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyId.ToString(), Guid.NewGuid().ToString());
 
                     return RedirectToAction("Index", "Home");

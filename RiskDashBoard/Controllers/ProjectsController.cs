@@ -9,6 +9,7 @@ namespace RiskDashBoard.Controllers
     {
         private readonly ApplicationDbContext _context;
 
+
         public ProjectsController(ApplicationDbContext context)
         {
             _context = context;
@@ -17,7 +18,13 @@ namespace RiskDashBoard.Controllers
         // GET: Projects
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Projects.ToListAsync());
+            string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
+            int.TryParse(stringUserId, out var userId);
+
+            return View(await _context.Projects.Where(x => x.Users.Any(x => x.UserId == userId)).ToListAsync());
+
+
+            //return View(await _context.Projects.ToListAsync());
         }
 
         // GET: Projects/Details/5
@@ -53,9 +60,15 @@ namespace RiskDashBoard.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(project);
+                string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
+                int userId = 0;
+
+                ///TODO REVISAR
+                project.Users = new List<User> { _context.Users.First(x => x.UserId == userId) };
+                _context.Projects.Add(project);
+
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index)); 
             }
             return View(project);
         }

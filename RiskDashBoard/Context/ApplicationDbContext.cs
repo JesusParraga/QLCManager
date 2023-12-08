@@ -22,7 +22,7 @@ namespace RiskDashBoard.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().HasMany(x => x.Projects).WithMany(x => x.Users).UsingEntity(x => x.ToTable("UserProject"));
+            modelBuilder.Entity<Project>().HasMany(x => x.Users).WithMany(x => x.Projects).UsingEntity(x => x.ToTable("UserProject"));
             modelBuilder.Entity<Phase>().HasMany(x => x.Risks).WithMany(x => x.Phases).UsingEntity(x => x.ToTable("PhaseRisk"));
             modelBuilder.Entity<Risk>().HasMany(x => x.Tags).WithMany(x => x.Risks).UsingEntity(x => x.ToTable("RiskTag"));
             modelBuilder.Entity<Phase>().HasOne(x => x.Project).WithMany(x => x.Phases).HasForeignKey(x => x.ProjectId).HasConstraintName("FK_ProjectPhase");
