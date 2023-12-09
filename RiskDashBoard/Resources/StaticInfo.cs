@@ -2,6 +2,14 @@
 {
     public static class StaticInfo
     {
-        static readonly List<string> PhasesListNames = ["Inicial"];
+        public enum ProjectPhases
+        {
+            NONE = 0,
+            EXPLORATION = 1,
+            VALUATION = 2,
+            FOUNDATIONS = 3, 
+            DEVELOPMENT = 4,
+            OPERATION = 5
+        }
     }
 }

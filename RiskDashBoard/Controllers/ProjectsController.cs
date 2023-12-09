@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RiskDashBoard.Context;
 using RiskDashBoard.Models;
 using RiskDashBoard.Models.ViewModels;
+using RiskDashBoard.Resources;
 
 namespace RiskDashBoard.Controllers
 {
@@ -62,10 +63,29 @@ namespace RiskDashBoard.Controllers
             if (ModelState.IsValid)
             {
                 string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
-                int userId = 0;
+                int.TryParse(stringUserId, out int userId);
 
                 ///TODO REVISAR
                 project.Users = new List<User> { _context.Users.First(x => x.UserId == userId) };
+                ///END TODO
+          
+                project.Phases = new List<Phase> { new() {
+                    PhaseTypeId = (int)StaticInfo.ProjectPhases.VALUATION,
+                    IsCurrentPhase = true,
+                    HistoricPhases = new List<HistoricPhase> { new(){
+                            Comments = "Start project",
+                            CurrentPhaseId = (int)StaticInfo.ProjectPhases.VALUATION,
+                            PreviousPhaseId = (int)StaticInfo.ProjectPhases.NONE
+                        }
+                    }
+                }};
+                
+                var historicPhase = new HistoricPhase { 
+                    Comments = "Start project", 
+                    CurrentPhaseId = (int)StaticInfo.ProjectPhases.VALUATION, 
+                    PreviousPhaseId = (int)StaticInfo.ProjectPhases.NONE 
+                };
+
                 _context.Projects.Add(project);
 
                 await _context.SaveChangesAsync();

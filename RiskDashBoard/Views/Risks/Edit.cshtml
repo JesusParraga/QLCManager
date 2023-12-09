@@ -1,0 +1,53 @@
+﻿@model RiskDashBoard.Models.Risk
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+</head>
+<body>
+
+<h4>Risk</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="RiskId" />
+            <div class="form-group">
+                <label asp-for="RiskName" class="control-label"></label>
+                <input asp-for="RiskName" class="form-control" />
+                <span asp-validation-for="RiskName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RiskDescription" class="control-label"></label>
+                <input asp-for="RiskDescription" class="form-control" />
+                <span asp-validation-for="RiskDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RiskType" class="control-label"></label>
+                <input asp-for="RiskType" class="form-control" />
+                <span asp-validation-for="RiskType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+</body>
+</html>
