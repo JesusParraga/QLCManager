@@ -20,9 +20,18 @@ namespace RiskDashBoard.Controllers
         }
 
         // GET: Risks
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    return View(await _context.Risks.ToListAsync());
+        //}
+
+        // GET: Risks
+        public async Task<IActionResult> Index(int projectId)
         {
-            return View(await _context.Risks.ToListAsync());
+            var project = await _context.Projects.Include("Phases").Include("Risks").FirstOrDefaultAsync(x => x.ProjectId == projectId);
+            var riskList = project?.Phases?.FirstOrDefault(x => x.IsCurrentPhase)?.Risks;
+
+            return View(riskList);
         }
 
         // GET: Risks/Details/5

@@ -22,7 +22,7 @@
             <div class="col-lg-4 col-md-6 col-12 mt-4 pt-2">
                     <div class="card border-0 bg-light rounded shadow">
                         <div class="card-body p-4">
-                            <a asp-action="Create">
+                        <a asp-controller="Risks" asp-ur asp-action="Index" asp-route-id="@item.ProjectId">
                             @switch (@item.Phases?.FirstOrDefault(x => x.IsCurrentPhase)?.PhaseId)
                             {
                                 case 1:
