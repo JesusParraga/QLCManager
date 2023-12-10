@@ -1,55 +1,112 @@
-﻿@model IEnumerable<RiskDashBoard.Models.Risk>
+﻿@model IEnumerable<RiskDashBoard.Models.Phase>
 
 @{
-    Layout = null;
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!DOCTYPE html>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://kit.fontawesome.com/6efa2f4c47.js" crossorigin="anonymous"></script>
+<!------ Include the above in your HEAD tag ---------->
+<style>
+    .card-header .fa {
+        transition: .3s transform ease-in-out;
+    }
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.RiskName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RiskDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RiskType)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.RiskName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RiskDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RiskType)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.RiskId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RiskId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RiskId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-</body>
-</html>
+    .card-header .collapsed .fa {
+        transform: rotate(90deg);
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-auto bg-light sticky-top">
+            <div class="d-flex flex-sm-column flex-row flex-nowrap bg-light align-items-center sticky-top">
+                <a href="/" class="d-block p-3 link-dark text-decoration-none" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Icon-only">
+                    <i class="bi-bootstrap fs-1"></i>
+                </a>
+                <ul class="nav nav-pills nav-flush flex-sm-column flex-row flex-nowrap mb-auto mx-auto text-center justify-content-between w-100 px-3 align-items-center">
+                    <li class="nav-item">
+                        <a asp-action="AddPhase" asp-route-id="@Model.FirstOrDefault().ProjectId" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Add new risk">
+                            <i class="fas fa-plus"></i></a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Next spiral level">
+                            <i class="fa-solid fa-caret-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Risk list">
+                            <i class="fa-solid fa-list-ol"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Back to projects">
+                            <i class="fa-solid fa-arrwo-rotate-left"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-sm p-3 min-vh-100">
+          
+            @foreach (var phase in Model)
+            {
+                <div class="card" style="margin-top: 5px">
+                    <h5 class="card-header">
+                        <a data-bs-toggle="collapse" href="#@phase.PhaseId" aria-expanded="true" aria-controls="collapse-example" id="phase_@phase.PhaseId" class="d-block">
+                            <i class="fa fa-chevron-down pull-right"></i>
+                            @switch (phase.PhaseTypeId)
+                            {
+                                case 1:
+                                    <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">EXPLORATION</span>
+                                    break;
+                                case 2:
+                                    <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">VALUATION</span>
+                                    break;
+                                case 3:
+                                    <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">FOUNDATIONS</span>
+                                    break;
+                                case 4:
+                                    <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">DEVELOPMENT</span>
+                                    break;
+                                case 5:
+                                    <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">OPERATION</span>
+                                    break;
+                            }
+                        </a>
+                    </h5>
+                    <div id="@phase.PhaseId" class="collapse @(phase.IsCurrentPhase ? " show" :"")" aria-labelledby="heading-example">
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach (var risk in phase?.Risks)
+                                {
+                                    var border = risk.RiskType == 4 ? "border-danger" : risk.RiskType == 3 ? "border-warning" : risk.RiskType == 2 ? "border-primary" : "border-success";
+                                    <div class="card @(border) mb-3" style="max-width: 18rem; margin-left: 10px">
+                                        <div class="card-body">
+                                            <h5 class="card-title">@risk.RiskName</h5>
+                                            <p class="card-text">@risk.RiskDescription</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* 
+<td>
+    <a asp-action="Edit" asp-route-id="@item.RiskId">Edit</a> |
+    <a asp-action="Details" asp-route-id="@item.RiskId">Details</a> |
+    <a asp-action="Delete" asp-route-id="@item.RiskId">Delete</a>
+</td>
+ *@
+
+
+
+
+

@@ -22,8 +22,9 @@ namespace RiskDashBoard.Controllers
         {
             string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
             int.TryParse(stringUserId, out var userId);
+            var projects = await _context.Projects.Include(x => x.Phases).Where(x => x.Users.Any(x => x.UserId == userId)).ToListAsync();
 
-            return View(await _context.Projects.Where(x => x.Users.Any(x => x.UserId == userId)).ToListAsync());
+            return View(projects);
 
 
             //return View(await _context.Projects.ToListAsync());
