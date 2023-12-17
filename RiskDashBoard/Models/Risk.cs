@@ -11,7 +11,7 @@ namespace RiskDashBoard.Models
         [Required]
         public string? RiskDescription { get; set;}
         [Required]
-        public int RiskType { get; set; }
+        public int RiskLevel { get; set; }
         public ICollection<Phase>? Phases { get; set; }
         public ICollection<Tag>? Tags { get; set; }
     }

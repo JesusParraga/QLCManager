@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RiskDashBoard.Context;
 using RiskDashBoard.Models;
+using RiskDashBoard.Models.ViewModels;
 
 namespace RiskDashBoard.Controllers
 {
@@ -53,9 +49,13 @@ namespace RiskDashBoard.Controllers
         }
 
         // GET: Risks/Create
-        public IActionResult Create()
+        public IActionResult Create(int id)
         {
-            return View();
+            var riskViewModel = new RiskViewModel
+            {
+                PhaseId = id
+            };
+            return PartialView(riskViewModel);
         }
 
         // POST: Risks/Create
@@ -63,15 +63,25 @@ namespace RiskDashBoard.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RiskId,RiskName,RiskDescription,RiskType")] Risk risk)
+        public async Task<IActionResult> Create([Bind("RiskId,RiskName,RiskDescription,RiskLevel,PhaseId")] RiskViewModel risk)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(risk);
+                var newRisk = new Risk { RiskDescription = risk.RiskDescription, RiskLevel = risk.RiskLevel, RiskName = risk.RiskName };
+                _context.Risks.Add(newRisk);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                var phase = await _context.Phase.Include(x => x.Risks).FirstOrDefaultAsync(x => x.PhaseId == risk.PhaseId).ConfigureAwait(false);
+
+                if (phase != null && newRisk != null) {          
+                    phase.Risks ??= new List<Risk>();
+                    phase.Risks.Add(newRisk);
+                    await _context.SaveChangesAsync();
+                }
+                
+                return RedirectToAction("GetPhasesWithRisks", "Risks", new { id = phase.ProjectId });
             }
-            return View(risk);
+            return PartialView(risk);
         }
 
         // GET: Risks/Edit/5
@@ -156,6 +166,20 @@ namespace RiskDashBoard.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> ValidatePhase(int id)
+        {
+            Phase? phase = await _context.Phase.Include(x => x.Risks)?.FirstOrDefaultAsync(x => x.PhaseId == id);
+
+            return PartialView("_ValidatePhase", phase);
+        }
+
+        public async Task<IActionResult> GetRisksPartial()
+        {
+            List<Risk> riskList = await _context.Risks.ToListAsync();
+
+            return PartialView("_ViewRiskList", riskList);
         }
 
         private bool RiskExists(int id)

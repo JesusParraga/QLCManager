@@ -255,6 +255,7 @@ namespace RiskDashBoard.Controllers
                         projectId = project.ProjectId,
                         UserId = user.UserId, 
                         UserName = user.UserName,
+                        Email = user.Email,
                         projectAsigned = project.Users.Any(x=> x.UserId == user.UserId)
                     });
                 }

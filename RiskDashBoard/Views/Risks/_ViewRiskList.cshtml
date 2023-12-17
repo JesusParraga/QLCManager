@@ -1,14 +1,14 @@
 ﻿
-@model List<RiskDashBoard.Models.ViewModels.UserProjectViewModel>
+@model List<RiskDashBoard.Models.Risk>
 
-<hr />
 <div class="row">
     <div class="col-12">
-            <table class="table table-bordered">
-            <thead>
+        <table class="table table-bordered table-striped table-responsive table-fixed">
+            <thead class="sticky-top">
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th>Risk Title</th>
+                    <th>Phase detected</th>
+                    <th>Risk Level</th>
                     <th class="text-center">Action</th>
                 </tr>
             </thead>
@@ -18,17 +18,11 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@Html.DisplayFor(modelItem => item.UserName)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                        <td>@Html.DisplayFor(modelItem => item.RiskName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.RiskLevel)</td>
+                            <td>@Html.DisplayFor(modelItem => item.RiskId)</td>
                         <td class="text-center">
-                            @if (item.projectAsigned)
-                            {
-                                <button type="button" id="@item.UserId" onclick="RemoveUser(@item.UserId, @item.projectId)" class="btn btn-danger"><i class="far fa-trash-alt"></i></button>
-                            }                       
-                            else
-                            {
-                                <button type="button" id="@item.UserId" onclick="AddUser(@item.UserId, @item.projectId)" class="btn btn-success"><i class="fa-solid fa-plus"></i></button>
-                            }
+                            @* <button type="button" id="@item.RiskId" onclick="AddRisk(@item.RiskId, @item.PhaseId)" class="btn btn-"><i class="far fa-trash-alt"></i></button>                            *@
                         </td>
                     </tr>
                 }
