@@ -56,13 +56,16 @@
                 </h5>
             </div>
 
-            @foreach (var phase in Model)
+            @foreach (var phase in Model.Select((value, i) => new {i, value}))
             {
                 <div class="card" style="margin-top: 5px">
                     <h5 class="card-header">
-                            <a data-bs-toggle="collapse" href="#@phase.PhaseId" aria-expanded="true" aria-controls="collapse-example" id="phase_@phase.PhaseId" class="d-block @(phase.IsCurrentPhase ? "" : "collapsed")">
+                            <a data-bs-toggle="collapse" href="#@phase.value.PhaseId" aria-expanded="true" aria-controls="collapse-example" id="phase_@phase.value.PhaseId" class="d-block @(phase.value.IsCurrentPhase ? "" : "collapsed")">
                                 <i class="fa fa-chevron-down pull-right"></i>
-                                @switch (phase.PhaseTypeId)
+
+                            @foreach (var phaseType in @phase?.value?.PhaseTypes)
+                            {
+                                @switch (phaseType.PhaseTypeId)
                                 {
                                     case 1:
                                         <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">EXPLORATION</span>
@@ -80,12 +83,13 @@
                                         <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">OPERATION</span>
                                         break;
                                 }
+                            }
                             </a>
                     </h5>
-                    <div id="@phase.PhaseId" class="collapse @(phase.IsCurrentPhase ? " show" :"")" aria-labelledby="heading-example">
+                    <div id="@phase.value.PhaseId" class="collapse @(phase.value.IsCurrentPhase ? " show" :"")" aria-labelledby="heading-example">
                         <div class="card-body">
                             <div class="row">
-                                @foreach (var risk in phase?.Risks)
+                                @foreach (var risk in phase?.value.Risks)
                                 {
                                     var border = risk.RiskLevel > 75 ? "border-danger" : risk.RiskLevel > 50  ? "border-warning" : risk.RiskLevel > 25 ? "border-primary" : "border-success";
                                     <div class="card @(border) mb-3" style="max-width: 18rem; margin-left: 10px">
@@ -97,17 +101,17 @@
                                 }
                             </div>
                             <div class="row">
-                                @if (phase.IsCurrentPhase)
+                                @if (phase.value.IsCurrentPhase)
                                 {
-                                    <a class="btn btn-outline-info mx-1 p-1" onclick="DislplayValidatePhase(@phase.PhaseId)"><i class="fa-solid fa-diagram-next"></i></a>
-                                    <a class="btn btn-outline-success mx-1 p-1" onclick="DislplayAddRiskToPhase(@phase.PhaseId)"><i class="fa-solid fa-plus"></i></a>
+                                    <a class="btn btn-outline-info mx-1 p-1" onclick="DislplayValidatePhase(@phase.value.PhaseId)"><i class="fa-solid fa-diagram-next"></i></a>
+                                    <a class="btn btn-outline-success mx-1 p-1" onclick="DislplayAddRiskToPhase(@phase.value.PhaseId)"><i class="fa-solid fa-plus"></i></a>
                                 }
                             </div>
                         </div>
                     </div>
                 </div>
-
-                @if (phase.PhaseTypeId == 3 && Model.Count() > 3)
+               
+                @if (phase.i == 2)
                 {
                     <div class="card" style="margin-top: 5px">
                         <h5 class="card-header">

@@ -21,27 +21,30 @@
     <div class="row">
     @foreach (var item in Model) {
             <div class="card text-dark bg-light mb-3" style="max-width: 18rem; margin-left: 10px">
-                <a asp-controller="Risks" asp-action="GetPhasesWithRisks" asp-route-id="@item.ProjectId" style="padding-top:15px;">  
-                    
-                    @switch (@item.Phases?.FirstOrDefault(x => x.IsCurrentPhase)?.PhaseTypeId)
-                    {
-                        case 1:
-                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">EXPLORATION</span>
-                            break;
-                        case 2:
-                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">VALUATION</span>
-                            break;
-                        case 3:
-                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">FOUNDATIONS</span>
-                            break;
-                        case 4:
-                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">DEVELOPMENT</span>
-                            break;
-                        case 5:
-                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">OPERATION</span>
-                            break;
-                    }
+                <a asp-controller="Risks" asp-action="GetPhasesWithRisks" asp-route-id="@item.ProjectId" style="padding-top:15px;">
 
+                    @foreach (var phaseType in @item.Phases?.FirstOrDefault(x => x.IsCurrentPhase)?.PhaseTypes)
+                    {
+                        @switch (phaseType.PhaseTypeId)
+                        {
+                            case 1:
+                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">EXPLORATION</span>
+                                break;
+                            case 2:
+                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">VALUATION</span>
+                                break;
+                            case 3:
+                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">FOUNDATIONS</span>
+                                break;
+                            case 4:
+                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">DEVELOPMENT</span>
+                                break;
+                            case 5:
+                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">OPERATION</span>
+                                break;
+                        }
+                    }
+                   
                     <div class="card-body">
                         <h5 class="card-title" style="padding-top:15px;">@item.ProjectName</h5>
                         <p class="card-text"></p>

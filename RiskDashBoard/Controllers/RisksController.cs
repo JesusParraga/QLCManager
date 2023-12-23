@@ -24,7 +24,7 @@ namespace RiskDashBoard.Controllers
         // GET: Risks
         public async Task<IActionResult> GetPhasesWithRisks(int id)
         {
-            Project? project = await _context.Projects.Include(x => x.Phases)?.ThenInclude(x => x.Risks)?.FirstOrDefaultAsync(x => x.ProjectId == id);
+            Project? project = await _context.Projects.Include(x => x.Phases)?.ThenInclude(p=>p.PhaseTypes).Include(x => x.Phases).ThenInclude(p=>p.Risks)?.FirstOrDefaultAsync(x => x.ProjectId == id);
             //var riskList = project?.Phases?.FirstOrDefault(x => x.IsCurrentPhase)?.Risks;
 
             return View(nameof(Index), project?.Phases);
@@ -177,11 +177,38 @@ namespace RiskDashBoard.Controllers
 
         public async Task<IActionResult> GetRisksPartial()
         {
-            List<Risk> riskList = await _context.Risks.ToListAsync();
+            List<Risk> riskList = await _context.Risks.Include(x => x.PhasesType).ToListAsync();
 
             return PartialView("_ViewRiskList", riskList);
         }
 
+        public async Task AddRiskToTheCurrentPhase(int id, int idPhase)
+        {
+            var currentPhase = await _context.Phase.Include(p=>p.Risks).Include(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.PhaseId == idPhase);
+
+            if (currentPhase != null && currentPhase.Risks != null && !currentPhase.Risks.Any(r => r.RiskId == id)) {
+                var risk = await _context.Risks.Include(r => r.PhasesType).FirstOrDefaultAsync(r => r.RiskId == id);
+                if (risk != null)
+                {
+                    currentPhase.Risks.Add(risk);
+                    var phasesToAdd = currentPhase.PhaseTypes.Select(pt => pt.PhaseTypeName).Except(risk.PhasesType.Select(r => r.PhaseTypeName));
+                    if (phasesToAdd != null && phasesToAdd.Any())
+                    {
+                        foreach (var phaseTypeId in phasesToAdd)
+                        {
+                            risk.PhasesType.Add(new PhaseType
+                            {
+                                PhaseTypeId = phaseTypeId,
+                                PhaseTypeName = phaseTypeId
+                            });
+                        }
+                        
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
         private bool RiskExists(int id)
         {
             return _context.Risks.Any(e => e.RiskId == id);

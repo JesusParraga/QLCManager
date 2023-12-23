@@ -22,7 +22,7 @@ namespace RiskDashBoard.Controllers
         {
             string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
             int.TryParse(stringUserId, out var userId);
-            var projects = await _context.Projects.Include(x => x.Phases).Where(x => x.Users.Any(x => x.UserId == userId)).ToListAsync();
+            var projects = await _context.Projects.Include(x => x.Phases).ThenInclude(p=> p.PhaseTypes).Where(x => x.Users.Any(x => x.UserId == userId)).ToListAsync();
 
             return View(projects);
 
@@ -71,7 +71,8 @@ namespace RiskDashBoard.Controllers
                 ///END TODO
           
                 project.Phases = new List<Phase> { new() {
-                    PhaseTypeId = (int)StaticInfo.ProjectPhases.VALUATION,
+                    //PhaseTypeId = (int)StaticInfo.ProjectPhases.VALUATION,
+                    PhaseTypes = new List<PhaseType> {new() {PhaseTypeId = (int)StaticInfo.ProjectPhases.VALUATION, PhaseTypeName = (int)StaticInfo.ProjectPhases.VALUATION } },
                     IsCurrentPhase = true,
                     HistoricPhases = new List<HistoricPhase> { new(){
                             Comments = "Start project",
