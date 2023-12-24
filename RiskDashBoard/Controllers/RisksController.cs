@@ -194,15 +194,10 @@ namespace RiskDashBoard.Controllers
                     var phasesToAdd = currentPhase.PhaseTypes.Select(pt => pt.PhaseTypeName).Except(risk.PhasesType.Select(r => r.PhaseTypeName));
                     if (phasesToAdd != null && phasesToAdd.Any())
                     {
-                        foreach (var phaseTypeId in phasesToAdd)
+                        foreach (var phaseNameToAdd in phasesToAdd)
                         {
-                            risk.PhasesType.Add(new PhaseType
-                            {
-                                PhaseTypeId = phaseTypeId,
-                                PhaseTypeName = phaseTypeId
-                            });
+                            risk.PhasesType.Add(currentPhase.PhaseTypes.First(pt => pt.PhaseTypeName == phaseNameToAdd));
                         }
-                        
                     }
 
                     await _context.SaveChangesAsync();

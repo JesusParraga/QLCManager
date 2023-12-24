@@ -1,32 +1,12 @@
 ﻿
 @model List<RiskDashBoard.Models.Risk>
 
-<hr />
-<div class="row" style="margin-left:5px">
-    <div class="form-check form-switch col-4">
-        <input class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckDefault">
-        <label class="form-check-label" for="flexSwitchCheckDefault">EXPLORATION</label>
-    </div>
-    <div class="form-check form-switch col-4">
-        <input class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckDefault">
-        <label class="form-check-label" for="flexSwitchCheckDefault">VALUATION</label>
-    </div>
-    <div class="form-check form-switch col-4">
-        <input class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckDefault">
-        <label class="form-check-label" for="flexSwitchCheckDefault">FOUNDATIONS</label>
-    </div>
-    <div class="form-check form-switch col-4">
-        <input class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckDefault">
-        <label class="form-check-label" for="flexSwitchCheckDefault">DEVELOPMENT</label>
-    </div>
-    <div class="form-check form-switch col-4">
-        <input class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckDefault">
-        <label class="form-check-label" for="flexSwitchCheckDefault">OPERATION</label>
-    </div>
-</div>
-<hr />
+<hr/>
 
 <div class="row">
+    <div class="col-12" style="margin-bottom:5px">
+        <input class="form-control" id="inputSearchRisk" type="text" placeholder="Search..">
+    </div>
     <div class="col-12" style="max-height:300px; overflow:auto">
         <table class="table table-bordered table-striped table-responsive">
             <thead class="sticky-top">
@@ -37,7 +17,7 @@
                     <th class="text-center">Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="riskTableSearch">
             @if (Model != null)
             {
                 @foreach (var item in Model)
@@ -70,4 +50,14 @@
             }
         });
     };
+
+    $(document).ready(function () {
+        $("#inputSearchRisk").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#riskTableSearch tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+
 </script>
