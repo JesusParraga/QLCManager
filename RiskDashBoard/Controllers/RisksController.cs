@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using RiskDashBoard.Context;
 using RiskDashBoard.Models;
 using RiskDashBoard.Models.ViewModels;
+using RiskDashBoard.Resources;
 
 namespace RiskDashBoard.Controllers
 {
@@ -171,8 +173,31 @@ namespace RiskDashBoard.Controllers
         public async Task<IActionResult> ValidatePhase(int id)
         {
             Phase? phase = await _context.Phase.Include(x => x.Risks)?.FirstOrDefaultAsync(x => x.PhaseId == id);
+            int low, medium, high, blocker = 0;
 
-            return PartialView("_ValidatePhase", phase);
+            if (phase != null && phase.Risks != null)
+            {
+                low = phase.Risks.Count(r => r.RiskLevel < 25);
+                medium = phase.Risks.Count(r => r.RiskLevel < 50);
+                high = phase.Risks.Count(r => r.RiskLevel < 75);
+                blocker = phase.Risks.Count(r => r.RiskLevel >= 70);
+
+                var phaseViewModel = new PhaseViewModel {
+                    PhaseId = phase.PhaseId,
+                    IsCurrentPhase = phase.IsCurrentPhase,
+                    ProjectId = phase.ProjectId,
+                    NumberLowRisk = low,
+                    NumberMediumRisk = medium,
+                    NumberHighRisk = high,
+                    NumberBlockerRisk = blocker,
+                };
+
+                phaseViewModel.RiskTypeDecission = RiskTypeEnum.Addressable.ToString();
+
+                return PartialView("_ValidatePhase", phaseViewModel);
+            }
+
+            return RedirectToAction("GetPhasesWithRisks", "Risks", new { id = phase.ProjectId });
         }
 
         public async Task<IActionResult> GetRisksPartial()

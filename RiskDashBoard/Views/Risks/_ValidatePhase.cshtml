@@ -1,12 +1,55 @@
-﻿@*
+﻿@using RiskDashBoard.Resources
+@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 
-@model RiskDashBoard.Models.Phase
+@model RiskDashBoard.Models.ViewModels.PhaseViewModel
 
 @{
 }
-
-<div>
-    Esto es una prueba
+<div class="card-group">
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="row no-gutters">
+            <div class="card-body" style="margin-left:5px">
+                <h5 class="card-title">Summary of Risks:</h5>
+                <ul class="list-group list-group-numbered">
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">LOW Rirsk</div>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">@Model.NumberLowRisk</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">MEDIUM Risk</div>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">@Model.NumberMediumRisk</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">HIGH Risk</div>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">@Model.NumberHighRisk</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">BLOKER Risk</div>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">@Model.NumberBlockerRisk</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="row no-gutters">
+            <div class="card-body">
+                <h5 class="card-title">
+                    Phase analysis
+                </h5>
+                <p class="card-text">After analysis, In the  current situation of the phase our proposal base in the risk list that you have is:</p>
+                @Html.DropDownListFor(model => model.RiskTypeDecission, new SelectList(Enum.GetValues(typeof(RiskTypeEnum))), new { @class = "form-control" })
+            </div>
+        </div>
+    </div>
 </div>
