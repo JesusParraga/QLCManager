@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using RiskDashBoard.Context;
 using RiskDashBoard.Models;
@@ -172,15 +171,15 @@ namespace RiskDashBoard.Controllers
 
         public async Task<IActionResult> ValidatePhase(int id)
         {
-            Phase? phase = await _context.Phase.Include(x => x.Risks)?.FirstOrDefaultAsync(x => x.PhaseId == id);
+            Phase? phase = await _context.Phase?.Include(x => x.Risks)?.Include(p => p.PhaseTypes)?.FirstOrDefaultAsync(x => x.PhaseId == id);
             int low, medium, high, blocker = 0;
 
             if (phase != null && phase.Risks != null)
             {
                 low = phase.Risks.Count(r => r.RiskLevel < 25);
-                medium = phase.Risks.Count(r => r.RiskLevel < 50);
-                high = phase.Risks.Count(r => r.RiskLevel < 75);
-                blocker = phase.Risks.Count(r => r.RiskLevel >= 70);
+                medium = phase.Risks.Count(r => r.RiskLevel < 50 && r.RiskLevel >= 25);
+                high = phase.Risks.Count(r => r.RiskLevel < 75 && r.RiskLevel >= 50);
+                blocker = phase.Risks.Count(r => r.RiskLevel >= 75);
 
                 var phaseViewModel = new PhaseViewModel {
                     PhaseId = phase.PhaseId,
@@ -190,9 +189,13 @@ namespace RiskDashBoard.Controllers
                     NumberMediumRisk = medium,
                     NumberHighRisk = high,
                     NumberBlockerRisk = blocker,
+                    PhaseTypes = phase?.PhaseTypes?.ToList()
                 };
 
+                CalculateNextPhasesAvailables(ref phaseViewModel);
+
                 phaseViewModel.RiskTypeDecission = RiskTypeEnum.Addressable.ToString();
+                phaseViewModel.IsDevelopmentPhaseChecked = true;
 
                 return PartialView("_ValidatePhase", phaseViewModel);
             }
@@ -206,7 +209,7 @@ namespace RiskDashBoard.Controllers
 
             return PartialView("_ViewRiskList", riskList);
         }
-
+        
         public async Task AddRiskToTheCurrentPhase(int id, int idPhase)
         {
             var currentPhase = await _context.Phase.Include(p=>p.Risks).Include(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.PhaseId == idPhase);
@@ -229,9 +232,56 @@ namespace RiskDashBoard.Controllers
                 }
             }
         }
+        
         private bool RiskExists(int id)
         {
             return _context.Risks.Any(e => e.RiskId == id);
+        }
+        
+        private void CalculateNextPhasesAvailables(ref PhaseViewModel phaseViewModel)
+        {
+            if(phaseViewModel.PhaseTypes.Count == 1)
+            {
+                switch(phaseViewModel.PhaseTypes.First().PhaseTypeName)
+                {
+                    case (int)StaticInfo.ProjectPhases.EXPLORATION:
+                        phaseViewModel.IsExplorationPhaseEnabled = false;
+                        phaseViewModel.IsValuationPhaseEnabled = true;
+                        phaseViewModel.IsFoundationsPhaseEnabled = false;
+                        phaseViewModel.IsDevelopmentPhaseEnabled = false;
+                        phaseViewModel.IsOperationPhaseEnabled = false;
+                    break;
+                    case (int)StaticInfo.ProjectPhases.VALUATION:
+                        phaseViewModel.IsExplorationPhaseEnabled = false;
+                        phaseViewModel.IsValuationPhaseEnabled = false;
+                        phaseViewModel.IsFoundationsPhaseEnabled = true;
+                        phaseViewModel.IsDevelopmentPhaseEnabled = false;
+                        phaseViewModel.IsOperationPhaseEnabled = false;
+                    break;
+                    case (int)StaticInfo.ProjectPhases.FOUNDATIONS:
+                        phaseViewModel.IsExplorationPhaseEnabled = false;
+                        phaseViewModel.IsValuationPhaseEnabled = false;
+                        phaseViewModel.IsFoundationsPhaseEnabled = true;
+                        phaseViewModel.IsDevelopmentPhaseEnabled = true;
+                        phaseViewModel.IsOperationPhaseEnabled = true;
+                    break;
+                    default:
+                        phaseViewModel.IsExplorationPhaseEnabled = false;
+                        phaseViewModel.IsValuationPhaseEnabled = false;
+                        phaseViewModel.IsFoundationsPhaseEnabled = true;
+                        phaseViewModel.IsDevelopmentPhaseEnabled = true;
+                        phaseViewModel.IsOperationPhaseEnabled = true;
+                    break;
+                }
+            }
+            else
+            {
+                phaseViewModel.IsExplorationPhaseEnabled = false;
+                phaseViewModel.IsValuationPhaseEnabled = false;
+                phaseViewModel.IsFoundationsPhaseEnabled = true;
+                phaseViewModel.IsDevelopmentPhaseEnabled = true;
+                phaseViewModel.IsOperationPhaseEnabled = true;
+            }
         }
     }
 }

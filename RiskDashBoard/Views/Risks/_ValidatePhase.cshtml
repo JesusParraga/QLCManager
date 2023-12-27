@@ -1,18 +1,12 @@
 ﻿@using RiskDashBoard.Resources
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-
 @model RiskDashBoard.Models.ViewModels.PhaseViewModel
 
-@{
-}
 <div class="card-group">
     <div class="card mb-3" style="max-width: 540px;">
         <div class="row no-gutters">
             <div class="card-body" style="margin-left:5px">
-                <h5 class="card-title">Summary of Risks:</h5>
-                <ul class="list-group list-group-numbered">
+                <h5 class="card-title">Summary of Risks</h5>
+                <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
                             <div class="fw-bold">LOW Rirsk</div>
@@ -47,9 +41,51 @@
                 <h5 class="card-title">
                     Phase analysis
                 </h5>
-                <p class="card-text">After analysis, In the  current situation of the phase our proposal base in the risk list that you have is:</p>
+                <p class="card-text">After analysis, in the current situation of the phase, our proposal, base in the risk list that you have, is:</p>
                 @Html.DropDownListFor(model => model.RiskTypeDecission, new SelectList(Enum.GetValues(typeof(RiskTypeEnum))), new { @class = "form-control" })
             </div>
         </div>
+        <div class="row" style="margin-left:10px">
+            @if (@Model.IsExplorationPhaseEnabled)
+            {
+                <div class="form-check form-switch col-6">
+                    <input asp-for=@Model.IsExplorationPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckExploration">
+                    <label class="form-check-label" for="flexSwitchCheckExploration">EXPLORATION</label>
+                </div>
+            }
+            @if (@Model.IsValuationPhaseEnabled)
+            {
+                <div class="form-check form-switch col-6">
+                    <input asp-for=@Model.IsValuationPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckValuation">
+                    <label class="form-check-label" for="flexSwitchCheckValuation">VALUATION</label>
+                </div>
+            }            
+            @if (@Model.IsFoundationsPhaseEnabled)
+            {
+                <div class="form-check form-switch col-6">
+                    <input asp-for=@Model.IsFoundationsPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckFoundations">
+                    <label class="form-check-label" for="flexSwitchCheckFoundations">FOUNDATIONS</label>
+                </div>
+            }
+            @if (@Model.IsDevelopmentPhaseEnabled)
+            {
+                <div class="form-check form-switch col-6">
+                    <input asp-for=@Model.IsDevelopmentPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckDevelopment">
+                    <label class="form-check-label" for="flexSwitchCheckDevelopment">DEVELOPMENT</label>
+                </div>
+            }
+            @if (@Model.IsOperationPhaseEnabled)
+            {
+                <div class="form-check form-switch col-6">
+                    <input asp-for=@Model.IsOperationPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckOperation">
+                    <label class="form-check-label" for="flexSwitchCheckOperation">OPERATION</label>
+                </div>
+            }
+        </div>
+        <div class="row">
+
+        </div>
     </div>
 </div>
+
+
