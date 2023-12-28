@@ -23,7 +23,7 @@ namespace RiskDashBoard.Models
             string phasesName = string.Empty;
 
             if (PhasesType != null && PhasesType.Count > 0) {
-                var phasestypeIds = (from p in PhasesType select p.PhaseTypeId ).ToList();
+                var phasestypeIds = (from p in PhasesType select p.PhaseTypeName ).ToList();
 
                 if (phasestypeIds.Any())
                 {

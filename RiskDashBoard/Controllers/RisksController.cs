@@ -233,6 +233,86 @@ namespace RiskDashBoard.Controllers
             }
         }
         
+        public async Task<IActionResult> NextPhase(int id, int idProject,bool checkExploration,bool checkValuation,bool checkFoundations, bool checkDevelopment, bool checkOperation)
+        {
+            string coment = String.Empty;
+            var project = await _context.Projects.Include(p => p.Phases).ThenInclude(p => p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
+            var phase = project.Phases.OrderBy(ph => ph.PhaseId).Select((p, i) => new {phase = p, index = i }).FirstOrDefault(p => p.phase.PhaseId == id);
+
+            if (phase != null)
+            {
+                project.Phases.First(p => p.IsCurrentPhase).IsCurrentPhase = false;
+                project.Phases.Add(new Phase
+                {
+                    PhaseTypes = new List<PhaseType>(),
+                    IsCurrentPhase = true,
+                    //HistoricPhases = new List<HistoricPhase> {
+                    //    new(){
+                    //        CurrentPhaseId = (int)StaticInfo.ProjectPhases.VALUATION,
+                    //        PreviousPhaseId = (int)StaticInfo.ProjectPhases.NONE,
+                    //        Comments = string.Empty
+                    //    }
+                    //}
+                });
+
+                if (phase.index < 2)
+                {
+                    var nextPhase = await BasicCalculationNewPhase(phase.phase.PhaseTypes.First().PhaseTypeName).ConfigureAwait(false);
+                    project.Phases.FirstOrDefault(p => p.IsCurrentPhase)?.PhaseTypes?.Add(nextPhase);
+                }
+                else
+                {
+                    var nextPhase = await AdvancedCalculationNewPhase(checkFoundations, checkDevelopment, checkOperation).ConfigureAwait(false);
+                    project.Phases.FirstOrDefault(p => p.IsCurrentPhase)?.PhaseTypes?.ToList().AddRange(nextPhase);
+                }
+
+
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("GetPhasesWithRisks", "Risks", new { id = idProject });
+        }
+
+        private async Task<List<PhaseType>> AdvancedCalculationNewPhase(bool checkFoundations, bool checkDevelopment, bool checkOperation)
+        {
+            var nextPhase = new List<PhaseType>();
+
+            if (checkFoundations)
+            {
+                nextPhase.Add(await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.FOUNDATIONS).ConfigureAwait(false));
+            }
+            if (checkDevelopment)
+            {
+                nextPhase.Add(await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.DEVELOPMENT).ConfigureAwait(false));
+            }
+            if (checkOperation)
+            {
+                nextPhase.Add(await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.OPERATION).ConfigureAwait(false));
+            }
+
+            return nextPhase;
+        }
+
+        private async Task<PhaseType> BasicCalculationNewPhase(int phaseTypeName)
+        {
+            var nextPhase = new PhaseType();
+
+            if (phaseTypeName == (int)StaticInfo.ProjectPhases.EXPLORATION)
+            {
+                nextPhase = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.VALUATION).ConfigureAwait(false);
+            }
+            if (phaseTypeName == (int)StaticInfo.ProjectPhases.VALUATION)
+            {
+                nextPhase = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.FOUNDATIONS).ConfigureAwait(false);
+            }
+            if (phaseTypeName == (int)StaticInfo.ProjectPhases.FOUNDATIONS)
+            {
+                nextPhase = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.DEVELOPMENT).ConfigureAwait(false);
+            }
+
+            return nextPhase;
+        }
+
         private bool RiskExists(int id)
         {
             return _context.Risks.Any(e => e.RiskId == id);

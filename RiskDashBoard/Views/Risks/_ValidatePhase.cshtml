@@ -83,9 +83,39 @@
             }
         </div>
         <div class="row">
-
+            <div class="form-group" style="margin-top:15px">
+                <button type="button" id="@Model.PhaseId" onclick="NextPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-circle-plus"></i></button>
+            </div>
         </div>
     </div>
 </div>
 
+<script>
+    function NextPhase(PhaseId, ProjectId) {
+
+        var checkExploration = $('#flexSwitchCheckExploration').val();
+        var checkValuation = $('#flexSwitchCheckValuation').val();
+        var checkFoundations = $('#flexSwitchCheckFoundations').val();
+        var checkDevelopment = $('#flexSwitchCheckDevelopment').val();
+        var checkOperation = $('#flexSwitchCheckOperation').val();
+
+        $.ajax({
+            url: "/Risks/NextPhase",
+            type: 'POST',
+            data: { 
+                id: PhaseId, 
+                idProject: ProjectId, 
+                checkExploration: checkExploration, 
+                checkValuation: checkValuation, 
+                checkFoundations: checkFoundations,
+                checkDevelopment: checkDevelopment,
+                checkOperation: checkOperation
+            },
+            success: function (data) {
+                $('#validatePhaseModal').modal('hide');
+            }
+        });
+    };
+
+</script>
 

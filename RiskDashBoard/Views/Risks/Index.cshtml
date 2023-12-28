@@ -65,7 +65,7 @@
 
                             @foreach (var phaseType in @phase?.value?.PhaseTypes)
                             {
-                                @switch (phaseType.PhaseTypeId)
+                                @switch (phaseType.PhaseTypeName)
                                 {
                                     case 1:
                                         <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">EXPLORATION</span>
