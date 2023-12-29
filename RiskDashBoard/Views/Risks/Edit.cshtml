@@ -1,4 +1,4 @@
-﻿@model RiskDashBoard.Models.Risk
+﻿@model RiskDashBoard.Models.ViewModels.RiskViewModel
 
 @{
     Layout = null;
@@ -20,6 +20,7 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="RiskId" />
+            <input type="hidden" asp-for="ProjectId"/>
             <div class="form-group">
                 <label asp-for="RiskName" class="control-label"></label>
                 <input asp-for="RiskName" class="form-control" />
@@ -43,7 +44,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+        <a asp-action="GetPhasesWithRisks" asp-route-id=@Model.ProjectId>Back to List</a>
 </div>
 
 @section Scripts {

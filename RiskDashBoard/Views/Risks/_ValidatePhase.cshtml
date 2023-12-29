@@ -84,7 +84,8 @@
         </div>
         <div class="row">
             <div class="form-group" style="margin-top:15px">
-                <button type="button" id="@Model.PhaseId" onclick="NextPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-circle-plus"></i></button>
+                <button type="button" id="@Model.PhaseId" onclick="BackPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-backward-step"></i></button>
+                <button type="button" id="@Model.PhaseId" onclick="NextPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-forward-step"></i></button>
             </div>
         </div>
     </div>
@@ -105,11 +106,24 @@
             data: { 
                 id: PhaseId, 
                 idProject: ProjectId, 
-                checkExploration: checkExploration, 
-                checkValuation: checkValuation, 
                 checkFoundations: checkFoundations,
                 checkDevelopment: checkDevelopment,
                 checkOperation: checkOperation
+            },
+            success: function (data) {
+                $('#validatePhaseModal').modal('hide');
+            }
+        });
+    };
+
+    function BackPhase(PhaseId, ProjectId) {
+
+        $.ajax({
+            url: "/Risks/BackPhase",
+            type: 'POST',
+            data: {
+                id: PhaseId,
+                idProject: ProjectId
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');

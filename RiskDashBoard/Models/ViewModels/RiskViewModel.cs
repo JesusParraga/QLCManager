@@ -14,7 +14,7 @@ namespace RiskDashBoard.Models.ViewModels
         public int RiskLevel { get; set; }
         [Required]
         public int PhaseId { get; set; }
-        //public ICollection<Phase>? Phases { get; set; }
-        //public ICollection<Tag>? Tags { get; set; }
+
+        public int ProjectId { get; set; }
     }
 }

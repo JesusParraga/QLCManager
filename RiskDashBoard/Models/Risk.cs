@@ -43,7 +43,6 @@ namespace RiskDashBoard.Models
             return phasesName;
         }
 
-
         private string GetPhaseName(int phaseTypeId)
         {
             return phaseTypeId switch

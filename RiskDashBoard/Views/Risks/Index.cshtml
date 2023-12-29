@@ -20,34 +20,7 @@
 
 <div class="container-fluid">
     <div class="row">
-@*         <div class="col-sm-auto bg-light sticky-top">
-            <div class="d-flex flex-sm-column flex-row flex-nowrap bg-light align-items-center sticky-top">
-                <a href="/" class="d-block p-3 link-dark text-decoration-none" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Icon-only">
-                    <i class="bi-bootstrap fs-1"></i>
-                </a>
-                <ul class="nav nav-pills nav-flush flex-sm-column flex-row flex-nowrap mb-auto mx-auto text-center justify-content-between w-100 px-3 align-items-center">
-                    <li class="nav-item">
-                        <a asp-action="AddPhase" asp-route-id="@Model.FirstOrDefault().ProjectId" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Add new risk">
-                            <i class="fas fa-plus"></i></a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Next spiral level">
-                            <i class="fa-solid fa-caret-right"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Risk list">
-                            <i class="fa-solid fa-list-ol"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Back to projects">
-                            <i class="fa-solid fa-arrwo-rotate-left"></i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div> *@
+
         <div class="col-sm p-3 min-vh-100">
 
             <div class="card" style="margin-top: 5px">
@@ -59,59 +32,66 @@
             @foreach (var phase in Model.Select((value, i) => new {i, value}))
             {
                 <div class="card" style="margin-top: 5px">
-                    <h5 class="card-header">
-                            <a data-bs-toggle="collapse" href="#@phase.value.PhaseId" aria-expanded="true" aria-controls="collapse-example" id="phase_@phase.value.PhaseId" class="d-block @(phase.value.IsCurrentPhase ? "" : "collapsed")">
-                                <i class="fa fa-chevron-down pull-right"></i>
-
-                            @foreach (var phaseType in @phase?.value?.PhaseTypes)
-                            {
-                                @switch (phaseType.PhaseTypeName)
-                                {
-                                    case 1:
-                                        <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">EXPLORATION</span>
-                                        break;
-                                    case 2:
-                                        <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">VALUATION</span>
-                                        break;
-                                    case 3:
-                                        <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">FOUNDATIONS</span>
-                                        break;
-                                    case 4:
-                                        <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">DEVELOPMENT</span>
-                                        break;
-                                    case 5:
-                                        <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">OPERATION</span>
-                                        break;
-                                }
-                            }
-                            </a>
-                    </h5>
+                    <div class="card-header row" style="margin-left:1px; margin-right: 1px;">
+                        @if (phase.value.IsCurrentPhase)
+                        {
+                            <div class="col-1">
+                                <a class="btn btn-outline-info mx-1 p-1" onclick="DislplayValidatePhase(@phase.value.PhaseId, @phase.value.ProjectId)"><i class="fa-solid fa-diagram-next"></i></a>
+                                <a class="btn btn-outline-success mx-1 p-1" onclick="DislplayAddRiskToPhase(@phase.value.PhaseId)"><i class="fa-solid fa-plus"></i></a>
+                            </div>
+                        }
+                        <div class="@(phase.value.IsCurrentPhase ? "col-11" : "col-12")">
+                            <h5>
+                                <a data-bs-toggle="collapse" href="#@phase.value.PhaseId" aria-expanded="true" aria-controls="collapse-example" id="phase_@phase.value.PhaseId" class="d-block @(phase.value.IsCurrentPhase ? "" : "collapsed")">
+                                    <i class="fa fa-chevron-down pull-right"></i>
+                                    @foreach (var phaseType in @phase?.value?.PhaseTypes)
+                                    {
+                                        @switch (phaseType.PhaseTypeName)
+                                        {
+                                            case 1:
+                                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">EXPLORATION</span>
+                                                break;
+                                            case 2:
+                                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">VALUATION</span>
+                                                break;
+                                            case 3:
+                                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">FOUNDATIONS</span>
+                                                break;
+                                            case 4:
+                                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">DEVELOPMENT</span>
+                                                break;
+                                            case 5:
+                                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">OPERATION</span>
+                                                break;
+                                        }
+                                    }
+                                </a>
+                            </h5>
+                        </div>
+                    </div>
                     <div id="@phase.value.PhaseId" class="collapse @(phase.value.IsCurrentPhase ? " show" :"")" aria-labelledby="heading-example">
                         <div class="card-body">
                             <div class="row">
-                                @foreach (var risk in phase?.value.Risks)
+                                @foreach (var risk in phase?.value?.Risks)
                                 {
-                                    var border = risk.RiskLevel > 75 ? "border-danger" : risk.RiskLevel > 50  ? "border-warning" : risk.RiskLevel > 25 ? "border-primary" : "border-success";
-                                    <div class="card @(border) mb-3" style="max-width: 18rem; margin-left: 10px">
+                                    var border = risk.RiskLevel >= 75 ? "border-danger" : risk.RiskLevel >= 50  ? "border-warning" : risk.RiskLevel >= 25 ? "border-primary" : "border-success";
+                                    <div class="card @(border) mb-3 border-2" style="max-width: 18rem; margin-left: 10px;">
                                         <div class="card-body">
                                             <h5 class="card-title">@risk.RiskId - @risk.RiskName</h5>
                                             <p class="card-text">@risk.RiskDescription</p>
                                         </div>
+                                        <div class="card-footer" style="margin-left:-12px; margin-right:-12px">
+                                            <a asp-action="Edit" asp-route-id="@risk.RiskId" asp-route-idProy="@phase?.value.ProjectId"><i class="fa-solid fa-pencil"></i></a>
+                                            <a asp-action="Delete" asp-route-id="@risk.RiskId"><i class="fas fa-trash"></i></a>
+                                        </div>
                                     </div>
-                                }
-                            </div>
-                            <div class="row">
-                                @if (phase.value.IsCurrentPhase)
-                                {
-                                    <a class="btn btn-outline-info mx-1 p-1" onclick="DislplayValidatePhase(@phase.value.PhaseId)"><i class="fa-solid fa-diagram-next"></i></a>
-                                    <a class="btn btn-outline-success mx-1 p-1" onclick="DislplayAddRiskToPhase(@phase.value.PhaseId)"><i class="fa-solid fa-plus"></i></a>
                                 }
                             </div>
                         </div>
                     </div>
                 </div>
                
-                @if (phase.i == 2)
+                @if (phase?.i == 2)
                 {
                     <div class="card" style="margin-top: 5px">
                         <h5 class="card-header">
@@ -163,13 +143,6 @@
     </div>
 </div>
 
-@* 
-<td>
-    <a asp-action="Edit" asp-route-id="@item.RiskId">Edit</a> |
-    <a asp-action="Details" asp-route-id="@item.RiskId">Details</a> |
-    <a asp-action="Delete" asp-route-id="@item.RiskId">Delete</a>
-</td>
- *@
 
 @section Scripts{
     <script type="text/javascript">
@@ -202,11 +175,11 @@
             });
         }
 
-        function DislplayValidatePhase(PhaseId) {
+        function DislplayValidatePhase(PhaseId, ProjectId) {
             $.ajax({
                 url: '/Risks/ValidatePhase',
                 type: 'GET',
-                data: { id: PhaseId },
+                data: { id: PhaseId, idProject: ProjectId },
                 success: function (data) {
                     $('#validatePhaseProcessBody').html(data);
                     $('#validatePhaseModal').modal('show');
@@ -216,6 +189,7 @@
                 }
             });
         }
+
     </script>
 }
 
