@@ -326,6 +326,14 @@ namespace RiskDashBoard.Controllers
             return RedirectToAction("GetPhasesWithRisks", "Risks", new { id = idProject });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetRiskComments(int id)
+        {
+            var risk = await _context.Risks.FirstOrDefaultAsync(r => r.RiskId == id);
+
+            return PartialView("_CommentsRisk");
+        }
+
         private async Task<List<PhaseType>> AdvancedCalculationNewPhase(bool checkFoundations, bool checkDevelopment, bool checkOperation)
         {
             var nextPhase = new List<PhaseType>();

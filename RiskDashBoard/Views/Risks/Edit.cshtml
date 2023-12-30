@@ -1,19 +1,10 @@
 ﻿@model RiskDashBoard.Models.ViewModels.RiskViewModel
 
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Edit</title>
-</head>
-<body>
-
-<h4>Risk</h4>
+<h4>Edit Risk</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -42,13 +33,33 @@
         </form>
     </div>
 </div>
-
 <div>
-        <a asp-action="GetPhasesWithRisks" asp-route-id=@Model.ProjectId>Back to List</a>
+    <a asp-action="GetPhasesWithRisks" asp-route-id=@Model.ProjectId>Back to List</a>
+</div>
+    
+ <hr/>
+ <div>
+    <div id="CommentRiskSectionDiv"></div>
 </div>
 
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    
+    <script>$('#CommentRiskSectionDiv').load("/Risks/GetRiskComments/@Model.ProjectId")</script>
+
+    <script>
+        function GetRiskCommentsPartial() {
+            $.ajax({
+                url: "/Risks/GetRiskComments",
+                type: 'GET',
+                data: { id: @Model.RiskId},
+                success: function (data) {
+                    jQuery("#CommentRiskSectionDiv").html(data);
+                }
+            });
+        };
+    </script>
 }
-</body>
-</html>
