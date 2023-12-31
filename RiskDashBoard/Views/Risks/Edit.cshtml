@@ -48,7 +48,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     
-    <script>$('#CommentRiskSectionDiv').load("/Risks/GetRiskComments/@Model.ProjectId")</script>
+    <script>$('#CommentRiskSectionDiv').load("/Risks/GetRiskComments/@Model.RiskId")</script>
 
     <script>
         function GetRiskCommentsPartial() {

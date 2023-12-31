@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using static RiskDashBoard.Resources.StaticInfo;
 
 namespace RiskDashBoard.Models
@@ -13,10 +14,12 @@ namespace RiskDashBoard.Models
         public string? RiskDescription { get; set; }
         [Required]
         public int RiskLevel { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
         public ICollection<Phase>? Phases { get; set; }
         public ICollection<Tag>? Tags { get; set; }
         public ICollection<PhaseType>? PhasesType { get; set; }
 
+        [NotMapped]
         public string PhasesName { get => GetPhasesName(); }
 
         private string GetPhasesName(){

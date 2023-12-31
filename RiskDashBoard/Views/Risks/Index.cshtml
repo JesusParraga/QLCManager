@@ -75,7 +75,7 @@
                                 @foreach (var risk in phase?.value?.Risks)
                                 {
                                     var border = risk.RiskLevel >= 75 ? "border-danger" : risk.RiskLevel >= 50  ? "border-warning" : risk.RiskLevel >= 25 ? "border-primary" : "border-success";
-                                    <div class="card @(border) mb-3 border-2" style="max-width: 18rem; margin-left: 10px;">
+                                    <div class="card @(border) mb-3 border-2" style="max-width: 18rem; margin-left: 20px;">
                                         <div class="card-body">
                                             <h5 class="card-title">@risk.RiskId - @risk.RiskName</h5>
                                             <p class="card-text">@risk.RiskDescription</p>

@@ -5,8 +5,9 @@ namespace RiskDashBoard
     {
         public enum SessionEnum
         {
-            SessionKeyUserName = 0,
-            SessionKeyId = 1
+            SessionKeyUserId = 0,
+            SessionKeyUserName = 1,
+            SessionKeyId = 2
         }
     }
 }

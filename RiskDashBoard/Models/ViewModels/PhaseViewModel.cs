@@ -21,7 +21,5 @@
         public bool IsFoundationsPhaseEnabled { get; set; }
         public bool IsDevelopmentPhaseEnabled { get; set; }
         public bool IsOperationPhaseEnabled { get; set; }
-
-
     }
 }

@@ -46,7 +46,7 @@
                     }
                    
                     <div class="card-body">
-                        <h5 class="card-title" style="padding-top:15px;">@item.ProjectName</h5>
+                        <h5 class="card-title" style="padding-top:15px;">@(item.ProjectName.Length > 45 ? @item.ProjectName.Substring(0, 45) + "..." : item.ProjectName)</h5>
                         <p class="card-text"></p>
                     </div>
                 </a>

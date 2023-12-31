@@ -329,9 +329,45 @@ namespace RiskDashBoard.Controllers
         [HttpGet]
         public async Task<IActionResult> GetRiskComments(int id)
         {
-            var risk = await _context.Risks.FirstOrDefaultAsync(r => r.RiskId == id);
+            var risk = await _context.Risks.Include(r => r.Comments).FirstAsync(r => r.RiskId == id).ConfigureAwait(false);
 
-            return PartialView("_CommentsRisk");
+            return PartialView("_CommentsRisk", risk);
+        }
+
+        public async Task DeleteCommentToRisk(int idComment)
+        {
+            var comment = await _context.Comments.FindAsync(idComment);
+            if (comment != null)
+            {
+                _context.Comments.Remove(comment);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddCommentToRisk(int idRisk, string commentTxt)
+        {
+            var stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
+            _ = int.TryParse(stringUserId, out var userId);
+
+            var commentToAdd = new Comment
+            {
+                RiskId = idRisk,
+                CreatedAt = DateTime.Now,
+                LastUpdatedAt = DateTime.Now,
+                UserComment = commentTxt,
+                UserId = userId,
+                UserName = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString())
+            };
+
+            var risk = await _context.Risks.Include(r => r.Comments).FirstAsync(r => r.RiskId == idRisk).ConfigureAwait(false);
+            if (risk != null)
+            {
+                if (risk.Comments == null) { risk.Comments = new List<Comment>(); risk.Comments.Add(commentToAdd); }
+                else { risk.Comments.Add(commentToAdd); }
+
+                await _context.SaveChangesAsync().ConfigureAwait(false);
+            }
         }
 
         private async Task<List<PhaseType>> AdvancedCalculationNewPhase(bool checkFoundations, bool checkDevelopment, bool checkOperation)

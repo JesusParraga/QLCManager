@@ -20,7 +20,7 @@ namespace RiskDashBoard.Controllers
         // GET: Projects
         public async Task<IActionResult> Index()
         {
-            string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
+            string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
             int.TryParse(stringUserId, out var userId);
             var projects = await _context.Projects.Include(x => x.Phases).ThenInclude(p=> p.PhaseTypes).Where(x => x.Users.Any(x => x.UserId == userId)).ToListAsync();
 
@@ -63,7 +63,7 @@ namespace RiskDashBoard.Controllers
         {
             if (ModelState.IsValid)
             {
-                string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
+                string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
                 int.TryParse(stringUserId, out int userId);
                 var phaseType = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.VALUATION).ConfigureAwait(false);
                 var userOwner = await _context.Users.FirstAsync(x => x.UserId == userId).ConfigureAwait(false);

@@ -8,7 +8,7 @@ namespace RiskDashBoard.AccessRights
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (string.IsNullOrEmpty(context.HttpContext.Session.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString()))){
+            if (string.IsNullOrEmpty(context.HttpContext.Session.GetString(SessionVariables.SessionEnum.SessionKeyId.ToString()))){
                 context.Result = new RedirectResult("~/Access/Login");
             }
 

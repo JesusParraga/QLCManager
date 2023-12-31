@@ -63,7 +63,8 @@ namespace RiskDashBoard.Controllers
 
                 if (user != null && user.UserId != 0 && !string.IsNullOrEmpty(user.UserName))
                 {
-                    HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString(), user.UserId.ToString());
+                    HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString(), user.UserId.ToString());
+                    HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString(), user.UserName.ToString());
                     HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyId.ToString(), Guid.NewGuid().ToString());
 
                     return RedirectToAction("Index", "Projects");
@@ -77,6 +78,7 @@ namespace RiskDashBoard.Controllers
 
         public ActionResult LogOut()
         {
+            HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString(), string.Empty);
             HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString(), string.Empty);
             HttpContext.Session.SetString(SessionVariables.SessionEnum.SessionKeyId.ToString(), string.Empty);
 
