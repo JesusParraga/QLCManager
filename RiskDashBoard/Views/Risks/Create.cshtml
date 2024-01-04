@@ -23,9 +23,9 @@
                 </div>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" style="margin-top:5px">
             <label asp-for="RiskDescription" class="control-label"></label>
-            <input asp-for="RiskDescription" class="form-control" />
+            <textarea asp-for="RiskDescription" class="form-control"></textarea>
             <span asp-validation-for="RiskDescription" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -56,7 +56,7 @@
         </div>
 
         <div class="form-group" style="margin-top:15px">
-            <input type="submit" value="Create" class="btn btn-primary" />
+            <input type="submit" value="Create" class="btn btn-primary float-sm-end"/>
         </div>
     </form>
 </div>

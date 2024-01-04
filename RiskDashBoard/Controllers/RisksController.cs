@@ -25,14 +25,18 @@ namespace RiskDashBoard.Controllers
         // GET: Risks
         public async Task<IActionResult> GetPhasesWithRisks(int id)
         {
-            Project? project = await _context.Projects.Include(x => x.Phases)?.ThenInclude(p=>p.PhaseTypes).Include(x => x.Phases).ThenInclude(p=>p.Risks)?.FirstOrDefaultAsync(x => x.ProjectId == id);
+            Project? project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id).ConfigureAwait(false);
 
-            var totalOperation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.OPERATION);
-            var totalDevelopment = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.DEVELOPMENT);
-            var totalFoundation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.FOUNDATIONS);
-
-            return View(nameof(Index), project?.Phases);
+            return View(nameof(Index), project);
         }
+
+        public async Task<IActionResult> GetPhasesAndRiskByProject(int id)
+        {
+            Project? project = await GetProjectPhasesInfo(id).ConfigureAwait(false);
+
+            return PartialView("_ProjectPhases",project?.Phases);
+        }
+
 
         // GET: Risks/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -307,7 +311,9 @@ namespace RiskDashBoard.Controllers
                 _context.SaveChanges();
             }
 
-            return RedirectToAction("GetPhasesWithRisks", "Risks", new { id = idProject });
+            //Project? projectToView = await GetProjectPhasesInfo(id);
+
+            return RedirectToAction("GetPhasesAndRiskByProject", "Risks", new { id = idProject });
         }
 
         public async Task<IActionResult> BackPhase(int id, int idProject)
@@ -323,7 +329,7 @@ namespace RiskDashBoard.Controllers
                 _context.SaveChanges();
             }
 
-            return RedirectToAction("GetPhasesWithRisks", "Risks", new { id = idProject });
+            return RedirectToAction("GetPhasesAndRiskByProject", "Risks", new { id = idProject });
         }
 
         [HttpGet]
@@ -368,6 +374,16 @@ namespace RiskDashBoard.Controllers
 
                 await _context.SaveChangesAsync().ConfigureAwait(false);
             }
+        }
+
+        private async Task<Project?> GetProjectPhasesInfo(int id)
+        {
+            Project? project = await _context.Projects.Include(x => x.Phases)?.ThenInclude(p => p.PhaseTypes).Include(x => x.Phases).ThenInclude(p => p.Risks)?.FirstOrDefaultAsync(x => x.ProjectId == id);
+
+            var totalOperation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.OPERATION);
+            var totalDevelopment = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.DEVELOPMENT);
+            var totalFoundation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.FOUNDATIONS);
+            return project;
         }
 
         private async Task<List<PhaseType>> AdvancedCalculationNewPhase(bool checkFoundations, bool checkDevelopment, bool checkOperation)

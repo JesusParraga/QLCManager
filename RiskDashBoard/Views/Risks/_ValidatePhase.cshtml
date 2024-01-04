@@ -83,9 +83,9 @@
             }
         </div>
         <div class="row">
-            <div class="form-group" style="margin-top:15px">
-                <button type="button" id="@Model.PhaseId" onclick="BackPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-backward-step"></i></button>
-                <button type="button" id="@Model.PhaseId" onclick="NextPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-forward-step"></i></button>
+            <div class="form-group" style="margin-top:15px; text-align:center">
+                <button type="button" id="@Model.PhaseId" onclick="BackPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-backward-step" style="margin-right:5px"></i>Previous phase</button>
+                <button type="button" id="@Model.PhaseId" onclick="NextPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-">Next phase<i class="fa-solid fa-forward-step" style="margin-left:5px"></i></button>
             </div>
         </div>
     </div>
@@ -112,6 +112,7 @@
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');
+                $("#projectPhases").html(data);
             }
         });
     };
@@ -127,6 +128,7 @@
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');
+                $("#projectPhases").html(data);
             }
         });
     };
