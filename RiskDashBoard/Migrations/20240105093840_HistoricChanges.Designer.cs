@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RiskDashBoard.Context;
 
@@ -11,9 +12,11 @@ using RiskDashBoard.Context;
 namespace RiskDashBoard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240105093840_HistoricChanges")]
+    partial class HistoricChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,8 +130,8 @@ namespace RiskDashBoard.Migrations
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CurrentPhaseType")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CurrentPhaseId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -136,8 +139,8 @@ namespace RiskDashBoard.Migrations
                     b.Property<bool>("IsBack")
                         .HasColumnType("bit");
 
-                    b.Property<string>("PreviousPhaseType")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PreviousPhaseId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");

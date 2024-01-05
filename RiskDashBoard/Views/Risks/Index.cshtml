@@ -8,7 +8,24 @@
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <!------ Include the above in your HEAD tag ---------->
 
-<div class="container-fluid" id="projectPhases"></div>
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="icon-tab-0" data-bs-toggle="tab" href="#icon-tabpanel-0" role="tab" aria-controls="icon-tabpanel-0" aria-selected="true"><i class="fa-solid fa-table"></i> Phases</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="icon-tab-1" data-bs-toggle="tab" href="#icon-tabpanel-1" role="tab" aria-controls="icon-tabpanel-1" aria-selected="false"><i class="fa-solid fa-timeline"></i> Timeline</a>
+    </li>
+</ul>
+<div class="tab-content" id="tab-content">
+    <div class="tab-pane active" id="icon-tabpanel-0" role="tabpanel" aria-labelledby="icon-tab-0">
+        <div class="container-fluid" id="projectPhases"></div>
+    </div>
+    <div class="tab-pane" id="icon-tabpanel-1" role="tabpanel" aria-labelledby="icon-tab-1">
+        <div class="container-fluid" id="projectHistoric"></div> @*<div class="container-fluid" id="projectPhases"></div> @Html.Partial("_ProjectPhasesTimeLine")*@
+    </div>
+</div>
+
+
 
 
 <!-- Modal -->
@@ -51,6 +68,8 @@
 
 <scrip>
     <script>$('#projectPhases').load("/Risks/GetPhasesAndRiskByProject/@Model.ProjectId")</script>
+    <script>$('#projectHistoric').load("/Risks/GetProjectHistoric/@Model.ProjectId")</script>
+
 
     @section Scripts {
         <script type="text/javascript">

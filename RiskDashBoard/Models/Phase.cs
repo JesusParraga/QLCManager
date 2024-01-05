@@ -11,7 +11,6 @@ namespace RiskDashBoard.Models
         public virtual Project? Project { get; set; }
         public int RiskTypeDecission { get; set; }
         public ICollection<Risk>? Risks { get; set; }
-        public ICollection<HistoricPhase>? HistoricPhases { get; set; }
         public ICollection<PhaseType>? PhaseTypes { get; set; }
     }
 }

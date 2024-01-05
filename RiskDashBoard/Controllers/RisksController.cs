@@ -37,6 +37,12 @@ namespace RiskDashBoard.Controllers
             return PartialView("_ProjectPhases",project?.Phases);
         }
 
+        public async Task<IActionResult> GetProjectHistoric(int id)
+        {
+            var historicProject = await _context.HistoricPhases.Where(h => h.ProjectId == id).ToListAsync().ConfigureAwait(false);
+
+            return PartialView("_ProjectPhasesTimeLine", historicProject);
+        }
 
         // GET: Risks/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -270,9 +276,18 @@ namespace RiskDashBoard.Controllers
         
         public async Task<IActionResult> NextPhase(int id, int idProject,bool checkFoundations, bool checkDevelopment, bool checkOperation)
         {
-            string coment = String.Empty;
-            var project = await _context.Projects.Include(p => p.Phases).ThenInclude(p => p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
+            var UserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
+            var UserName = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
+            var project = await _context.Projects.Include(p=> p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
             var phase = project.Phases.OrderBy(ph => ph.PhaseId).Select((p, i) => new {phase = p, index = i }).FirstOrDefault(p => p.phase.PhaseId == id);
+            var newHistoricProject = new HistoricPhase { 
+                Date = DateTime.UtcNow, 
+                IsBack = false, 
+                ProjectId = idProject,
+                UserId = int.Parse(UserId),
+                UserName = UserName  
+            };
+            
 
             if (phase != null && project.Phases.OrderBy(ph => ph.PhaseId).ElementAtOrDefault(phase.index + 1) != null)
             {
@@ -287,13 +302,6 @@ namespace RiskDashBoard.Controllers
                 {
                     PhaseTypes = new List<PhaseType>(),
                     IsCurrentPhase = true,
-                    //HistoricPhases = new List<HistoricPhase> {
-                    //    new(){
-                    //        CurrentPhaseId = (int)StaticInfo.ProjectPhases.VALUATION,
-                    //        PreviousPhaseId = (int)StaticInfo.ProjectPhases.NONE,
-                    //        Comments = string.Empty
-                    //    }
-                    //}
                 });
 
                 if (phase.index < 2)
@@ -307,11 +315,9 @@ namespace RiskDashBoard.Controllers
                     project.Phases.FirstOrDefault(p => p.IsCurrentPhase)?.PhaseTypes?.ToList().AddRange(nextPhase);
                 }
 
-
+                project.HistoricPhases.Add(newHistoricProject);
                 _context.SaveChanges();
             }
-
-            //Project? projectToView = await GetProjectPhasesInfo(id);
 
             return RedirectToAction("GetPhasesAndRiskByProject", "Risks", new { id = idProject });
         }
@@ -319,7 +325,7 @@ namespace RiskDashBoard.Controllers
         public async Task<IActionResult> BackPhase(int id, int idProject)
         {
             string coment = String.Empty;
-            var project = await _context.Projects.Include(p => p.Phases).ThenInclude(p => p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
+            var project = await _context.Projects.Include(p => p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
             var phase = project.Phases.OrderBy(ph => ph.PhaseId).Select((p, i) => new { phase = p, index = i }).FirstOrDefault(p => p.phase.PhaseId == id);
 
             if (phase != null && phase.index > 0)

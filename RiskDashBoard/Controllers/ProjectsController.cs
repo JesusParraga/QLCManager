@@ -11,7 +11,6 @@ namespace RiskDashBoard.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-
         public ProjectsController(ApplicationDbContext context)
         {
             _context = context;
@@ -71,19 +70,18 @@ namespace RiskDashBoard.Controllers
                 project.Users = new List<User> { userOwner };        
                 project.Phases = new List<Phase> { new() {
                     PhaseTypes = new List<PhaseType> { phaseType },
-                    IsCurrentPhase = true,
-                    HistoricPhases = new List<HistoricPhase> { new(){
+                    IsCurrentPhase = true
+                    },
+                };
+                project.HistoricPhases = new List<HistoricPhase> { new(){
                             Comments = "Start project",
-                            CurrentPhaseId = (int)StaticInfo.ProjectPhases.VALUATION,
-                            PreviousPhaseId = (int)StaticInfo.ProjectPhases.NONE
-                        }
-                    }
-                }};
-                
-                var historicPhase = new HistoricPhase { 
-                    Comments = "Start project", 
-                    CurrentPhaseId = (int)StaticInfo.ProjectPhases.VALUATION, 
-                    PreviousPhaseId = (int)StaticInfo.ProjectPhases.NONE 
+                            CurrentPhaseType = StaticInfo.ProjectPhases.VALUATION.ToString(),
+                            PreviousPhaseType = StaticInfo.ProjectPhases.NONE.ToString(),
+                            Date = DateTime.UtcNow,
+                            UserId = userId,
+                            UserName = userOwner.UserName,
+                            IsBack = false
+                        } 
                 };
 
                 _context.Projects.Add(project);

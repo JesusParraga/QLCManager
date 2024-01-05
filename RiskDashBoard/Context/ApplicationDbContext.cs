@@ -32,7 +32,7 @@ namespace RiskDashBoard.Context
             modelBuilder.Entity<Risk>().HasMany(x => x.Tags).WithMany(x => x.Risks).UsingEntity(x => x.ToTable("RiskTag"));
             modelBuilder.Entity<Comment>().HasOne(x=> x.Risk).WithMany(x => x.Comments).HasForeignKey(x => x.RiskId).HasConstraintName("FJ_CommentRisk");
             modelBuilder.Entity<PhaseType>().HasMany(x => x.Risks).WithMany(x => x.PhasesType).UsingEntity(x => x.ToTable("PhaseTypeRisk"));
-            modelBuilder.Entity<HistoricPhase>().HasOne(x => x.Phase).WithMany(x => x.HistoricPhases).HasForeignKey(x => x.PhaseId).HasConstraintName("FK_HistoricPhasePhase");
+            modelBuilder.Entity<HistoricPhase>().HasOne(x => x.Project).WithMany(x => x.HistoricPhases).HasForeignKey(x => x.ProjectId).HasConstraintName("FK_HistoricProject");
 
 
 
