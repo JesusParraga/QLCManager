@@ -30,6 +30,7 @@
         </div>
         <div class="form-group">
             <input asp-for="PhaseId" type ="hidden" id="phaseHiddenId"/>
+            <input asp-for="ProjectId" type="hidden" id="projectHiddenId" />
         </div>
 
         <div class="row" style="margin-left:5px; margin-top:10px">
@@ -61,8 +62,19 @@
     </form>
 </div>
 
+<hr />
+
 <div class="row">
-    <div style="margin-top: 5px">
+    <div class="row" style="margin-bottom: 10px">
+        <div class="col-9">
+            <input class="form-control" id="inputSearchRisk" type="text" placeholder="Search..">
+        </div>
+        <div class="form-check form-switch col-3">
+            <input class="form-check-input" type="checkbox" role="checkbox" id="ckOnwProject" onclick="SearchRisks()">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Select all projects</label>
+        </div>
+    </div>
+    <div>
         <div id="ViewPartialRisk"></div>
     </div>
 </div>

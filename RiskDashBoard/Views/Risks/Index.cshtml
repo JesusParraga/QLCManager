@@ -18,10 +18,10 @@
 </ul>
 <div class="tab-content" id="tab-content">
     <div class="tab-pane active" id="icon-tabpanel-0" role="tabpanel" aria-labelledby="icon-tab-0">
-        <div class="container-fluid" id="projectPhases"></div>
+        <div class="container-fluid" id="projectPhases" style="max-height:740px; overflow:auto"></div>
     </div>
     <div class="tab-pane" id="icon-tabpanel-1" role="tabpanel" aria-labelledby="icon-tab-1">
-        <div class="container-fluid" id="projectHistoric"></div> @*<div class="container-fluid" id="projectPhases"></div> @Html.Partial("_ProjectPhasesTimeLine")*@
+        <div class="container-fluid" id="projectHistoric" style="max-height:740px; overflow:auto"></div>
     </div>
 </div>
 
@@ -73,11 +73,11 @@
 
     @section Scripts {
         <script type="text/javascript">
-            function DislplayAddRiskToPhase(PhaseId) {
+            function DislplayAddRiskToPhase(PhaseId, ProjectId) {
                 $.ajax({
                     url: '/Risks/Create',
                     type: 'GET',
-                    data: { id: PhaseId },
+                    data: { id: PhaseId, idProject: ProjectId },
                     success: function (data) {
                         $('#addRiskToPhaseBody').html(data);
                         $('#addRiskToPhaseModal').modal('show');
@@ -93,6 +93,7 @@
                 $.ajax({
                     url: '/Risks/GetRisksPartial',
                     type: 'GET',
+                    data: {idProject: @Model.ProjectId },
                     success: function (data) {
                         $('#ViewPartialRisk').html(data);
                     },

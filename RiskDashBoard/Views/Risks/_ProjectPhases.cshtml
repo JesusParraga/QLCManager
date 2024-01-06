@@ -29,7 +29,7 @@
                     {
                         <div class="col-1">
                             <a class="btn btn-outline-info mx-1 p-1" onclick="DislplayValidatePhase(@phase.value.PhaseId, @phase.value.ProjectId)"><i class="fa-solid fa-diagram-next"></i></a>
-                            <a class="btn btn-outline-success mx-1 p-1" onclick="DislplayAddRiskToPhase(@phase.value.PhaseId)"><i class="fa-solid fa-plus"></i></a>
+                            <a class="btn btn-outline-success mx-1 p-1" onclick="DislplayAddRiskToPhase(@phase.value.PhaseId, @phase.value.ProjectId)"><i class="fa-solid fa-plus"></i></a>
                         </div>
                     }
                     <div class="@(phase.value.IsCurrentPhase ? "col-11" : "col-12")">

@@ -63,11 +63,12 @@ namespace RiskDashBoard.Controllers
         }
 
         // GET: Risks/Create
-        public IActionResult Create(int id)
+        public IActionResult Create(int id, int idProject)
         {
             var riskViewModel = new RiskViewModel
             {
-                PhaseId = id
+                PhaseId = id,
+                ProjectId = idProject
             };
             return PartialView(riskViewModel);
         }
@@ -244,9 +245,30 @@ namespace RiskDashBoard.Controllers
             return RedirectToAction("GetPhasesWithRisks", "Risks", new { id = idProject });
         }
 
-        public async Task<IActionResult> GetRisksPartial()
+        public async Task<IActionResult> GetRisksPartial(int idProject)
         {
-            List<Risk> riskList = await _context.Risks.Include(x => x.PhasesType).ToListAsync();
+            
+            List<Risk> riskList = new List<Risk>(); 
+
+            if (idProject != 0)
+            {
+                var project = await _context.Projects.Include(p => p.Phases)
+                    .ThenInclude(ph => ph.Risks)
+                    .ThenInclude(r => r.PhasesType).FirstAsync(p => p.ProjectId == idProject);
+
+                riskList = project.Phases.SelectMany(ph => ph.Risks).ToList();
+            }
+            else
+            {
+                var UserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
+                int UserIntID = int.Parse(UserId);
+
+                var projectList = await _context.Projects.Include(p => p.Users.Where(u => u.UserId == UserIntID)).Include(p => p.Phases)
+                    .ThenInclude(ph => ph.Risks)
+                    .ThenInclude(r => r.PhasesType).ToListAsync();
+
+                riskList = projectList.SelectMany(p => p.Phases.SelectMany(ph => ph.Risks)).ToList();
+            }
 
             return PartialView("_ViewRiskList", riskList);
         }

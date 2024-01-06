@@ -1,12 +1,7 @@
 ﻿
 @model List<RiskDashBoard.Models.Risk>
 
-<hr/>
-
 <div class="row">
-    <div class="col-12" style="margin-bottom:5px">
-        <input class="form-control" id="inputSearchRisk" type="text" placeholder="Search..">
-    </div>
     <div class="col-12" style="max-height:300px; overflow:auto">
         <table class="table table-bordered table-striped table-responsive">
             <thead class="sticky-top">
@@ -59,5 +54,26 @@
             });
         });
     });
+
+    function SearchRisks() {
+        
+        var projectId = $('#projectHiddenId').val()
+
+        if ($('#ckOnwProject').prop('checked')) {
+            projectId = 0;
+        }
+
+        $.ajax({
+            url: '/Risks/GetRisksPartial',
+            type: 'GET',
+            data: { idProject: projectId },
+            success: function (data) {
+                $('#ViewPartialRisk').html(data);
+            },
+            error: function () {
+                alert('Error occurred while fetching data.');
+            }
+        });
+    }
 
 </script>
