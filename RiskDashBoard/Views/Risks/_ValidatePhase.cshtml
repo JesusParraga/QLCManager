@@ -42,7 +42,7 @@
                     Phase analysis
                 </h5>
                 <p class="card-text">After analysis, in the current situation of the phase, our proposal, base in the risk list that you have, is:</p>
-                @Html.DropDownListFor(model => model.RiskTypeDecission, new SelectList(Enum.GetValues(typeof(RiskTypeEnum))), new { @class = "form-control" })
+                @Html.DropDownListFor(model => model.RiskTypeDecission, Enum.GetValues(typeof(RiskTypeEnum)).Cast<RiskTypeEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value=((int)r).ToString()}), new { @class = "form-control", @id = "dropDownDecission" })
             </div>
         </div>
         <div class="row" style="margin-left:10px">
@@ -83,6 +83,9 @@
             }
         </div>
         <div class="row">
+            <textarea id="phaseComments" class="form-control"></textarea>
+        </div>
+        <div class="row">
             <div class="form-group" style="margin-top:15px; text-align:center">
                 <button type="button" id="@Model.PhaseId" onclick="BackPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-backward-step" style="margin-right:5px"></i>Previous phase</button>
                 <button type="button" id="@Model.PhaseId" onclick="NextPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-">Next phase<i class="fa-solid fa-forward-step" style="margin-left:5px"></i></button>
@@ -99,6 +102,10 @@
         var checkFoundations = $('#flexSwitchCheckFoundations').val();
         var checkDevelopment = $('#flexSwitchCheckDevelopment').val();
         var checkOperation = $('#flexSwitchCheckOperation').val();
+        var phaseComments = $('#phaseComments').val();
+        var decissionSelectedId = $('#dropDownDecission').val();
+        //var decissionSelectedId = $("#dropDownDecission option:selected").text();
+
 
         $.ajax({
             url: "/Risks/NextPhase",
@@ -108,7 +115,9 @@
                 idProject: ProjectId, 
                 checkFoundations: checkFoundations,
                 checkDevelopment: checkDevelopment,
-                checkOperation: checkOperation
+                checkOperation: checkOperation,
+                comments: phaseComments,
+                decissionId: decissionSelectedId
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');
@@ -119,12 +128,17 @@
 
     function BackPhase(PhaseId, ProjectId) {
 
+        var phaseComments = $('#phaseComments').val();
+        var decissionSelectedId = $('#dropDownDecission').val();
+
         $.ajax({
             url: "/Risks/BackPhase",
             type: 'POST',
             data: {
                 id: PhaseId,
-                idProject: ProjectId
+                idProject: ProjectId,
+                comments: phaseComments,
+                decissionId: decissionSelectedId
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');

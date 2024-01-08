@@ -296,7 +296,7 @@ namespace RiskDashBoard.Controllers
             }
         }
         
-        public async Task<IActionResult> NextPhase(int id, int idProject,bool checkFoundations, bool checkDevelopment, bool checkOperation)
+        public async Task<IActionResult> NextPhase(int id, int idProject,bool checkFoundations, bool checkDevelopment, bool checkOperation, string comments, int decissionId)
         {
             var UserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
             var UserName = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
@@ -307,18 +307,25 @@ namespace RiskDashBoard.Controllers
                 IsBack = false, 
                 ProjectId = idProject,
                 UserId = int.Parse(UserId),
-                UserName = UserName  
+                UserName = UserName,
+                Comments = comments,
+                DecissionId = decissionId
             };
             
 
             if (phase != null && project.Phases.OrderBy(ph => ph.PhaseId).ElementAtOrDefault(phase.index + 1) != null)
             {
+                newHistoricProject.PreviousPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
                 project.Phases.First(p => p.IsCurrentPhase).IsCurrentPhase = false;
                 project.Phases.ElementAt(phase.index + 1).IsCurrentPhase = true;
+                newHistoricProject.CurrentPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
+
+                project.HistoricPhases.Add(newHistoricProject);
                 _context.SaveChanges();
             }
             else if (phase != null)
             {
+                newHistoricProject.PreviousPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
                 project.Phases.First(p => p.IsCurrentPhase).IsCurrentPhase = false;
                 project.Phases.Add(new Phase
                 {
@@ -329,11 +336,13 @@ namespace RiskDashBoard.Controllers
                 if (phase.index < 2)
                 {
                     var nextPhase = await BasicCalculationNewPhase(phase.phase.PhaseTypes.First().PhaseTypeName).ConfigureAwait(false);
+                    newHistoricProject.CurrentPhaseType = nextPhase.PhaseTypeNameDescription;
                     project.Phases.FirstOrDefault(p => p.IsCurrentPhase)?.PhaseTypes?.Add(nextPhase);
                 }
                 else
                 {
                     var nextPhase = await AdvancedCalculationNewPhase(checkFoundations, checkDevelopment, checkOperation).ConfigureAwait(false);
+                    newHistoricProject.CurrentPhaseType = string.Join(",", nextPhase.Select(pt => pt.PhaseTypeNameDescription).ToList());
                     project.Phases.FirstOrDefault(p => p.IsCurrentPhase)?.PhaseTypes?.ToList().AddRange(nextPhase);
                 }
 
@@ -344,16 +353,33 @@ namespace RiskDashBoard.Controllers
             return RedirectToAction("GetPhasesAndRiskByProject", "Risks", new { id = idProject });
         }
 
-        public async Task<IActionResult> BackPhase(int id, int idProject)
+        public async Task<IActionResult> BackPhase(int id, int idProject, string comments, int decissionId)
         {
-            string coment = String.Empty;
             var project = await _context.Projects.Include(p => p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
             var phase = project.Phases.OrderBy(ph => ph.PhaseId).Select((p, i) => new { phase = p, index = i }).FirstOrDefault(p => p.phase.PhaseId == id);
 
             if (phase != null && phase.index > 0)
             {
+                var UserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
+                var UserName = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
+
+                var newHistoricProject = new HistoricPhase
+                {
+                    Date = DateTime.UtcNow,
+                    IsBack = true,
+                    ProjectId = idProject,
+                    UserId = int.Parse(UserId),
+                    UserName = UserName,
+                    Comments = comments,
+                    DecissionId = decissionId
+                };
+
+                newHistoricProject.PreviousPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
                 project.Phases.First(p => p.IsCurrentPhase).IsCurrentPhase = false;
                 project.Phases.ElementAt(phase.index - 1).IsCurrentPhase = true;
+                newHistoricProject.CurrentPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
+                project.HistoricPhases.Add(newHistoricProject);
+
                 _context.SaveChanges();
             }
 

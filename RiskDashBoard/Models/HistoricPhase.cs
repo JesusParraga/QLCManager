@@ -1,4 +1,5 @@
 ﻿using Humanizer;
+using RiskDashBoard.Resources;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 
@@ -17,7 +18,12 @@ namespace RiskDashBoard.Models
         public DateTime? Date { get; set; }
         public bool IsBack { get; set; }
 
+        public int DecissionId { get; set; }
+
         [NotMapped]
         public string HumanizedDate => (DateTime.Now - Date).Value.Humanize(culture: new CultureInfo("en-En"));
+
+        [NotMapped]
+        public string DecissionDescription => ((RiskTypeEnum)DecissionId).ToString();
     }
 }
