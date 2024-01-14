@@ -64,7 +64,7 @@ namespace RiskDashBoard.Controllers
             {
                 string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
                 int.TryParse(stringUserId, out int userId);
-                var phaseType = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.VALUATION).ConfigureAwait(false);
+                var phaseType = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.VALUATION).ConfigureAwait(false);
                 var userOwner = await _context.Users.FirstAsync(x => x.UserId == userId).ConfigureAwait(false);
 
                 project.Users = new List<User> { userOwner };        
@@ -75,8 +75,8 @@ namespace RiskDashBoard.Controllers
                 };
                 project.HistoricPhases = new List<HistoricPhase> { new(){
                             Comments = "Start project",
-                            CurrentPhaseType = StaticInfo.ProjectPhases.VALUATION.ToString(),
-                            PreviousPhaseType = StaticInfo.ProjectPhases.NONE.ToString(),
+                            CurrentPhaseType = StaticInfo.ProjectPhasesEnum.VALUATION.ToString(),
+                            PreviousPhaseType = StaticInfo.ProjectPhasesEnum.NONE.ToString(),
                             Date = DateTime.UtcNow,
                             UserId = userId,
                             UserName = userOwner.UserName,

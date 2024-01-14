@@ -78,11 +78,11 @@ namespace RiskDashBoard.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RiskId,RiskName,RiskDescription,RiskLevel,PhaseId")] RiskViewModel risk)
+        public async Task<IActionResult> Create([Bind("RiskId,RiskName,RiskDescription,RiskProbability,RiskImpact,PhaseId")] RiskViewModel risk)
         {
             if (ModelState.IsValid)
             {
-                var newRisk = new Risk { RiskDescription = risk.RiskDescription, RiskLevel = risk.RiskLevel, RiskName = risk.RiskName };
+                var newRisk = new Risk { RiskDescription = risk.RiskDescription, RiskProbability = risk.RiskProbability, RiskImpact = risk.RiskImpact, RiskName = risk.RiskName };
                 _context.Risks.Add(newRisk);
                 await _context.SaveChangesAsync();
 
@@ -115,7 +115,8 @@ namespace RiskDashBoard.Controllers
             var riskViewModel = new RiskViewModel
             {
                 RiskId = risk.RiskId,
-                RiskLevel = risk.RiskLevel,
+                RiskImpact = risk.RiskImpact,
+                RiskProbability = risk.RiskProbability,
                 RiskName = risk.RiskName,
                 RiskDescription = risk.RiskDescription,
                 ProjectId = idProy
@@ -129,7 +130,7 @@ namespace RiskDashBoard.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RiskId,RiskName,RiskDescription,RiskType,RiskLevel, ProjectId")] RiskViewModel risk)
+        public async Task<IActionResult> Edit(int id, [Bind("RiskId,RiskName,RiskDescription,RiskType,RiskProbability,RiskImpact,ProjectId")] RiskViewModel risk)
         {
             if (id != risk.RiskId)
             {
@@ -142,7 +143,8 @@ namespace RiskDashBoard.Controllers
                 {
                     var riskToUpdate = await _context.Risks.FirstAsync(r => id == r.RiskId);
                     riskToUpdate.RiskDescription = risk.RiskDescription;
-                    riskToUpdate.RiskLevel = risk.RiskLevel;
+                    riskToUpdate.RiskImpact = risk.RiskImpact;
+                    riskToUpdate.RiskProbability = risk.RiskProbability;
                     riskToUpdate.RiskName = risk.RiskName;
                     _context.Update(riskToUpdate);
                     await _context.SaveChangesAsync();
@@ -204,10 +206,10 @@ namespace RiskDashBoard.Controllers
 
             if (phase != null && phase.phaseSelected.Risks != null)
             {
-                low = phase.phaseSelected.Risks.Count(r => r.RiskLevel < 25);
-                medium = phase.phaseSelected.Risks.Count(r => r.RiskLevel < 50 && r.RiskLevel >= 25);
-                high = phase.phaseSelected.Risks.Count(r => r.RiskLevel < 75 && r.RiskLevel >= 50);
-                blocker = phase.phaseSelected.Risks.Count(r => r.RiskLevel >= 75);
+                low = phase.phaseSelected.Risks.Count(r => r.RiskLevel  == (int)StaticInfo.RiskLevelEnum.LOW);
+                medium = phase.phaseSelected.Risks.Count(r => r.RiskLevel == (int)StaticInfo.RiskLevelEnum.MEDIUM);
+                high = phase.phaseSelected.Risks.Count(r => r.RiskLevel == (int)StaticInfo.RiskLevelEnum.HIGH);
+                blocker = phase.phaseSelected.Risks.Count(r => r.RiskLevel == (int)StaticInfo.RiskLevelEnum.BLOCKER);
 
                 var phaseViewModel = new PhaseViewModel
                 {
@@ -278,9 +280,19 @@ namespace RiskDashBoard.Controllers
             var currentPhase = await _context.Phase.Include(p=>p.Risks).Include(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.PhaseId == idPhase);
 
             if (currentPhase != null && currentPhase.Risks != null && !currentPhase.Risks.Any(r => r.RiskId == id)) {
-                var risk = await _context.Risks.Include(r => r.PhasesType).FirstOrDefaultAsync(r => r.RiskId == id);
-                if (risk != null)
+                var riskToCopy = await _context.Risks.Include(r => r.PhasesType).FirstOrDefaultAsync(r => r.RiskId == id);
+                if (riskToCopy != null)
                 {
+                    var risk = new Risk
+                    {
+                        RiskDescription = riskToCopy.RiskDescription,
+                        RiskProbability = riskToCopy.RiskProbability,
+                        RiskImpact = riskToCopy.RiskImpact,
+                        RiskName = riskToCopy.RiskName,
+                        PhasesType = new List<PhaseType>()
+                    };
+                    foreach(var ph in riskToCopy.PhasesType) { risk.PhasesType.Add(ph); }
+
                     currentPhase.Risks.Add(risk);
                     var phasesToAdd = currentPhase.PhaseTypes.Select(pt => pt.PhaseTypeName).Except(risk.PhasesType.Select(r => r.PhaseTypeName));
                     if (phasesToAdd != null && phasesToAdd.Any())
@@ -327,23 +339,30 @@ namespace RiskDashBoard.Controllers
             {
                 newHistoricProject.PreviousPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
                 project.Phases.First(p => p.IsCurrentPhase).IsCurrentPhase = false;
-                project.Phases.Add(new Phase
-                {
-                    PhaseTypes = new List<PhaseType>(),
-                    IsCurrentPhase = true,
-                });
 
                 if (phase.index < 2)
                 {
                     var nextPhase = await BasicCalculationNewPhase(phase.phase.PhaseTypes.First().PhaseTypeName).ConfigureAwait(false);
                     newHistoricProject.CurrentPhaseType = nextPhase.PhaseTypeNameDescription;
-                    project.Phases.FirstOrDefault(p => p.IsCurrentPhase)?.PhaseTypes?.Add(nextPhase);
+                    project.Phases.Add(new Phase
+                    {
+                        PhaseTypes = new List<PhaseType> { nextPhase },
+                        IsCurrentPhase = true,
+                        ProjectId = idProject,
+
+                    });
                 }
                 else
                 {
                     var nextPhase = await AdvancedCalculationNewPhase(checkFoundations, checkDevelopment, checkOperation).ConfigureAwait(false);
                     newHistoricProject.CurrentPhaseType = string.Join(",", nextPhase.Select(pt => pt.PhaseTypeNameDescription).ToList());
-                    project.Phases.FirstOrDefault(p => p.IsCurrentPhase)?.PhaseTypes?.ToList().AddRange(nextPhase);
+                    project.Phases.Add(new Phase
+                    {
+                        PhaseTypes = nextPhase,
+                        IsCurrentPhase = true,
+                        ProjectId = idProject,
+
+                    });
                 }
 
                 project.HistoricPhases.Add(newHistoricProject);
@@ -434,9 +453,9 @@ namespace RiskDashBoard.Controllers
         {
             Project? project = await _context.Projects.Include(x => x.Phases)?.ThenInclude(p => p.PhaseTypes).Include(x => x.Phases).ThenInclude(p => p.Risks)?.FirstOrDefaultAsync(x => x.ProjectId == id);
 
-            var totalOperation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.OPERATION);
-            var totalDevelopment = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.DEVELOPMENT);
-            var totalFoundation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.FOUNDATIONS);
+            var totalOperation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.OPERATION);
+            var totalDevelopment = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.DEVELOPMENT);
+            var totalFoundation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.FOUNDATIONS);
             return project;
         }
 
@@ -446,15 +465,15 @@ namespace RiskDashBoard.Controllers
 
             if (checkFoundations)
             {
-                nextPhase.Add(await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.FOUNDATIONS).ConfigureAwait(false));
+                nextPhase.Add(await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.FOUNDATIONS).ConfigureAwait(false));
             }
             if (checkDevelopment)
             {
-                nextPhase.Add(await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.DEVELOPMENT).ConfigureAwait(false));
+                nextPhase.Add(await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.DEVELOPMENT).ConfigureAwait(false));
             }
             if (checkOperation)
             {
-                nextPhase.Add(await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.OPERATION).ConfigureAwait(false));
+                nextPhase.Add(await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.OPERATION).ConfigureAwait(false));
             }
 
             return nextPhase;
@@ -464,17 +483,17 @@ namespace RiskDashBoard.Controllers
         {
             var nextPhase = new PhaseType();
 
-            if (phaseTypeName == (int)StaticInfo.ProjectPhases.EXPLORATION)
+            if (phaseTypeName == (int)StaticInfo.ProjectPhasesEnum.EXPLORATION)
             {
-                nextPhase = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.VALUATION).ConfigureAwait(false);
+                nextPhase = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.VALUATION).ConfigureAwait(false);
             }
-            if (phaseTypeName == (int)StaticInfo.ProjectPhases.VALUATION)
+            if (phaseTypeName == (int)StaticInfo.ProjectPhasesEnum.VALUATION)
             {
-                nextPhase = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.FOUNDATIONS).ConfigureAwait(false);
+                nextPhase = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.FOUNDATIONS).ConfigureAwait(false);
             }
-            if (phaseTypeName == (int)StaticInfo.ProjectPhases.FOUNDATIONS)
+            if (phaseTypeName == (int)StaticInfo.ProjectPhasesEnum.FOUNDATIONS)
             {
-                nextPhase = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhases.DEVELOPMENT).ConfigureAwait(false);
+                nextPhase = await _context.PhaseTypes.FirstAsync(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.DEVELOPMENT).ConfigureAwait(false);
             }
 
             return nextPhase;
@@ -491,21 +510,21 @@ namespace RiskDashBoard.Controllers
             {
                 switch(phaseViewModel.PhaseTypes.First().PhaseTypeName)
                 {
-                    case (int)StaticInfo.ProjectPhases.EXPLORATION:
+                    case (int)StaticInfo.ProjectPhasesEnum.EXPLORATION:
                         phaseViewModel.IsExplorationPhaseEnabled = false;
                         phaseViewModel.IsValuationPhaseEnabled = true;
                         phaseViewModel.IsFoundationsPhaseEnabled = false;
                         phaseViewModel.IsDevelopmentPhaseEnabled = false;
                         phaseViewModel.IsOperationPhaseEnabled = false;
                     break;
-                    case (int)StaticInfo.ProjectPhases.VALUATION:
+                    case (int)StaticInfo.ProjectPhasesEnum.VALUATION:
                         phaseViewModel.IsExplorationPhaseEnabled = false;
                         phaseViewModel.IsValuationPhaseEnabled = false;
                         phaseViewModel.IsFoundationsPhaseEnabled = true;
                         phaseViewModel.IsDevelopmentPhaseEnabled = false;
                         phaseViewModel.IsOperationPhaseEnabled = false;
                     break;
-                    case (int)StaticInfo.ProjectPhases.FOUNDATIONS:
+                    case (int)StaticInfo.ProjectPhasesEnum.FOUNDATIONS:
                         phaseViewModel.IsExplorationPhaseEnabled = false;
                         phaseViewModel.IsValuationPhaseEnabled = false;
                         phaseViewModel.IsFoundationsPhaseEnabled = true;

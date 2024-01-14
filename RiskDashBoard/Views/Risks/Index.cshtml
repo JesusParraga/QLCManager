@@ -118,6 +118,34 @@
                 });
             }
 
+            function LoadProjectPhases() {
+                $.ajax({
+                    url: '/Risks/GetPhasesAndRiskByProject',
+                    type: 'GET',
+                    data: { id: @Model.ProjectId },
+                    success: function (data) {
+                        $('#projectPhases').html(data);
+                    },
+                    error: function () {
+                        alert('Error occurred while fetching data.');
+                    }
+                });
+            }
+
+            function LoadProjectHistoric() {
+                $.ajax({
+                    url: '/Risks/GetProjectHistoric',
+                    type: 'GET',
+                    data: { id: @Model.ProjectId },
+                    success: function (data) {
+                        $('#projectHistoric').html(data);
+                    },
+                    error: function () {
+                        alert('Error occurred while fetching data.');
+                    }
+                });
+            }
+
         </script>
     }
 </scrip>

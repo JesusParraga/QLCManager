@@ -1,4 +1,5 @@
-﻿@model RiskDashBoard.Models.ViewModels.RiskViewModel
+﻿@using static RiskDashBoard.Resources.StaticInfo
+@model RiskDashBoard.Models.ViewModels.RiskViewModel
 
 @{
     Layout = null;
@@ -8,7 +9,7 @@
     <form asp-action="Create">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="row">
-            <div class="col-10">
+            <div class="col-7">
                 <div class="form-group">
                     <label asp-for="RiskName" class="control-label"></label>
                     <input asp-for="RiskName" class="form-control" />
@@ -17,9 +18,18 @@
             </div>
             <div class="col-2">
                 <div class="form-group">
-                    <label asp-for="RiskLevel" class="control-label"></label>
-                    <input asp-for="RiskLevel" class="form-control" min="0" max="100" type="number" step="5"/>
-                    <span asp-validation-for="RiskLevel" class="text-danger"></span>
+                    <label asp-for="RiskProbability" class="control-label"></label>
+                    @* <input asp-for="RiskProbability" class="form-control" min="0" max="100" type="number" step="5" /> *@
+                    @Html.DropDownListFor(model => model.RiskProbability, Enum.GetValues(typeof(RiskProbabilityEnum)).Cast<RiskProbabilityEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value = ((int)r).ToString() }), new { @class = "form-control", @id = "dropDownDecission" })
+                    <span asp-validation-for="RiskProbability" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="form-group">
+                    <label asp-for="RiskImpact" class="control-label"></label>
+                    @* <input asp-for="RiskImpact" class="form-control" min="0" max="100" type="number" step="5" /> *@
+                    @Html.DropDownListFor(model => model.RiskImpact, Enum.GetValues(typeof(RiskImpactEnum)).Cast<RiskImpactEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value = ((int)r).ToString() }), new { @class = "form-control", @id = "dropDownDecission" })
+                    <span asp-validation-for="RiskImpact" class="text-danger"></span>
                 </div>
             </div>
         </div>

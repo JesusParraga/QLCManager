@@ -97,11 +97,11 @@
 <script>
     function NextPhase(PhaseId, ProjectId) {
 
-        var checkExploration = $('#flexSwitchCheckExploration').val();
-        var checkValuation = $('#flexSwitchCheckValuation').val();
-        var checkFoundations = $('#flexSwitchCheckFoundations').val();
-        var checkDevelopment = $('#flexSwitchCheckDevelopment').val();
-        var checkOperation = $('#flexSwitchCheckOperation').val();
+        // var checkExploration = $('#flexSwitchCheckExploration').val();
+        // var checkValuation = $('#flexSwitchCheckValuation').val();
+        var checkFoundations = $('#flexSwitchCheckFoundations').is(':checked');
+        var checkDevelopment = $('#flexSwitchCheckDevelopment').is(':checked');
+        var checkOperation = $('#flexSwitchCheckOperation').is(':checked');
         var phaseComments = $('#phaseComments').val();
         var decissionSelectedId = $('#dropDownDecission').val();
         //var decissionSelectedId = $("#dropDownDecission option:selected").text();
@@ -121,7 +121,9 @@
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');
-                $("#projectPhases").html(data);
+                //$("#projectPhases").html(data);
+                LoadProjectPhases();
+                LoadProjectHistoric();
             }
         });
     };
@@ -142,7 +144,9 @@
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');
-                $("#projectPhases").html(data);
+                //$("#projectPhases").html(data);
+                LoadProjectPhases();
+                LoadProjectHistoric();
             }
         });
     };

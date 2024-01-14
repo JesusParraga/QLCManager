@@ -16,12 +16,12 @@ namespace RiskDashBoard.Models
         [NotMapped]
         public string PhaseTypeNameDescription => PhaseTypeName switch
         {
-            1 => StaticInfo.ProjectPhases.EXPLORATION.ToString(),
-            2 => StaticInfo.ProjectPhases.VALUATION.ToString(),
-            3 => StaticInfo.ProjectPhases.FOUNDATIONS.ToString(),
-            4 => StaticInfo.ProjectPhases.DEVELOPMENT.ToString(),
-            5 => StaticInfo.ProjectPhases.OPERATION.ToString(),
-            _ => StaticInfo.ProjectPhases.NONE.ToString(),
+            1 => StaticInfo.ProjectPhasesEnum.EXPLORATION.ToString(),
+            2 => StaticInfo.ProjectPhasesEnum.VALUATION.ToString(),
+            3 => StaticInfo.ProjectPhasesEnum.FOUNDATIONS.ToString(),
+            4 => StaticInfo.ProjectPhasesEnum.DEVELOPMENT.ToString(),
+            5 => StaticInfo.ProjectPhasesEnum.OPERATION.ToString(),
+            _ => StaticInfo.ProjectPhasesEnum.NONE.ToString(),
         };
 
     }

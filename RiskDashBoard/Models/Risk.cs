@@ -13,7 +13,9 @@ namespace RiskDashBoard.Models
         [Required]
         public string? RiskDescription { get; set; }
         [Required]
-        public int RiskLevel { get; set; }
+        public int RiskProbability { get; set; }
+        [Required]
+        public int RiskImpact {  get; set; }
         public ICollection<Comment>? Comments { get; set; }
         public ICollection<Phase>? Phases { get; set; }
         public ICollection<Tag>? Tags { get; set; }
@@ -21,6 +23,12 @@ namespace RiskDashBoard.Models
 
         [NotMapped]
         public string PhasesName { get => GetPhasesName(); }
+        
+        [NotMapped]
+        public int RiskLevel { get => GetRiskLevel(); }
+
+        [NotMapped]
+        public string RiskLevelName { get => GetRiskLevelName(); }
 
         private string GetPhasesName(){
             string phasesName = string.Empty;
@@ -50,12 +58,73 @@ namespace RiskDashBoard.Models
         {
             return phaseTypeId switch
             {
-                1 => ProjectPhases.EXPLORATION.ToString(),
-                2 => ProjectPhases.VALUATION.ToString(),
-                3 => ProjectPhases.FOUNDATIONS.ToString(),
-                4 => ProjectPhases.DEVELOPMENT.ToString(),
-                5 => ProjectPhases.OPERATION.ToString(),
-                _ => ProjectPhases.NONE.ToString(),
+                1 => ProjectPhasesEnum.EXPLORATION.ToString(),
+                2 => ProjectPhasesEnum.VALUATION.ToString(),
+                3 => ProjectPhasesEnum.FOUNDATIONS.ToString(),
+                4 => ProjectPhasesEnum.DEVELOPMENT.ToString(),
+                5 => ProjectPhasesEnum.OPERATION.ToString(),
+                _ => ProjectPhasesEnum.NONE.ToString(),
+            };
+        }
+
+        private int GetRiskLevel()
+        {
+            if(RiskProbability == (int)RiskProbabilityEnum.RARE) {
+                if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.LOW;
+                if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.LOW;
+                if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.MEDIUM;
+            }
+
+            if (RiskProbability == (int)RiskProbabilityEnum.UNLIKELY)
+            {
+                if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.LOW;
+                if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.LOW;
+                if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.HIGH;
+            }
+
+            if (RiskProbability == (int)RiskProbabilityEnum.POSSIBLE)
+            {
+                if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.LOW;
+                if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.HIGH;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.HIGH;
+            }
+
+            if (RiskProbability == (int)RiskProbabilityEnum.LIKELY)
+            {
+                if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.HIGH;
+                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.HIGH;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.BLOCKER;
+            }
+
+            if (RiskProbability == (int)RiskProbabilityEnum.CERTAIN)
+            {
+                if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.HIGH;
+                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.BLOCKER;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.BLOCKER;
+            }
+
+            return (int)RiskLevelEnum.NONE;
+        }
+    
+        private string GetRiskLevelName()
+        {
+            return RiskLevel switch
+            {
+                (int)RiskLevelEnum.LOW => RiskLevelEnum.LOW.ToString(),
+                (int)RiskLevelEnum.MEDIUM => RiskLevelEnum.MEDIUM.ToString(),
+                (int)RiskLevelEnum.HIGH => RiskLevelEnum.HIGH.ToString(),
+                (int)RiskLevelEnum.BLOCKER => RiskLevelEnum.BLOCKER.ToString(),
+                _ => RiskLevelEnum.NONE.ToString(),
             };
         }
     }

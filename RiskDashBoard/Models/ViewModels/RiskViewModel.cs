@@ -11,7 +11,9 @@ namespace RiskDashBoard.Models.ViewModels
         [Required]
         public string? RiskDescription { get; set; }
         [Required]
-        public int RiskLevel { get; set; }
+        public int RiskProbability { get; set; }
+        [Required]
+        public int RiskImpact { get; set; }
         [Required]
         public int PhaseId { get; set; }
 
