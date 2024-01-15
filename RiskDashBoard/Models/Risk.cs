@@ -113,7 +113,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.BLOCKER;
             }
 
-            return (int)RiskLevelEnum.NONE;
+            return (int)RiskLevelEnum.LOW;
         }
     
         private string GetRiskLevelName()
@@ -124,7 +124,7 @@ namespace RiskDashBoard.Models
                 (int)RiskLevelEnum.MEDIUM => RiskLevelEnum.MEDIUM.ToString(),
                 (int)RiskLevelEnum.HIGH => RiskLevelEnum.HIGH.ToString(),
                 (int)RiskLevelEnum.BLOCKER => RiskLevelEnum.BLOCKER.ToString(),
-                _ => RiskLevelEnum.NONE.ToString(),
+                _ => RiskLevelEnum.LOW.ToString(),
             };
         }
     }

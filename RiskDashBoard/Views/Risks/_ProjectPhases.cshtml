@@ -26,45 +26,32 @@
         @foreach (var phase in Model.Select((value, i) => new {i, value}))
         {
             <div class="card" style="margin-top: 5px">
-                <div class="card-header row" style="margin-left:1px; margin-right: 1px;">
-                    @if (phase.value.IsCurrentPhase)
-                    {
-                        <div class="col-1">
-                            <a class="btn btn-outline-info mx-1 p-1" onclick="DislplayValidatePhase(@phase.value.PhaseId, @phase.value.ProjectId)"><i class="fa-solid fa-diagram-next"></i></a>
-                            <a class="btn btn-outline-success mx-1 p-1" onclick="DislplayAddRiskToPhase(@phase.value.PhaseId, @phase.value.ProjectId)"><i class="fa-solid fa-plus"></i></a>
-                        </div>
-                    }
-                    <div class="@(phase.value.IsCurrentPhase ? "col-11" : "col-12")">
-                        <h5>
-                            <a data-bs-toggle="collapse" href="#@phase.value.PhaseId" aria-expanded="true" aria-controls="collapse-example" id="phase_@phase.value.PhaseId" class="d-block @(phase.value.IsCurrentPhase ? "" : "collapsed")">
-                                <i class="fa fa-chevron-down pull-right"></i>
-                                @foreach (var phaseType in @phase?.value?.PhaseTypes)
-                                {
-                                    @switch (phaseType.PhaseTypeName)
-                                    {
-                                        case 1:
-                                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">EXPLORATION</span>
-                                            break;
-                                        case 2:
-                                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">VALUATION</span>
-                                            break;
-                                        case 3:
-                                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">FOUNDATIONS</span>
-                                            break;
-                                        case 4:
-                                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">DEVELOPMENT</span>
-                                            break;
-                                        case 5:
-                                            <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0">OPERATION</span>
-                                            break;
-                                    }
-                                }
-                            </a>
-                        </h5>
-                    </div>
+                <div class="card-header row" style="margin-left:1px; margin-right: 1px; @(phase.value.IsCurrentPhase ? "background-color:aliceblue;" : "")">
+                    <h5>
+                        <a data-bs-toggle="collapse" href="#@phase.value.PhaseId" aria-expanded="true" aria-controls="collapse-example" id="phase_@phase.value.PhaseId" class="d-block @(phase.value.IsCurrentPhase ? "" : "collapsed")">
+                            <i class="fa fa-chevron-down pull-right"></i>
+                            @foreach (var phaseType in @phase?.value?.PhaseTypes)
+                            {
+                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0" style="margin-right:5px">@phaseType.PhaseTypeNameDescription</span>
+                            }
+                        </a>
+                    </h5>
                 </div>
                 <div id="@phase.value.PhaseId" class="collapse @(phase.value.IsCurrentPhase ? " show" :"")" aria-labelledby="heading-example">
                     <div class="card-body">
+                        <div class ="row" style="margin-bottom:10px">
+                            @if (phase.value.IsCurrentPhase)
+                            {
+                                <div class="col-2">
+                                    <a class="btn btn-outline-info mx-1" onclick="DislplayValidatePhase(@phase.value.PhaseId, @phase.value.ProjectId)"><i class="fa-solid fa-diagram-next"></i></a>
+                                    <a class="btn btn-outline-success mx-1" onclick="DislplayAddRiskToPhase(@phase.value.PhaseId, @phase.value.ProjectId)"><i class="fa-solid fa-plus"></i></a>
+                                </div>
+                                <div class="form-check form-switch col-2" style="margin-left:-50px; margin-top:7px">
+                                    <input class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckOrderBy" onchange="OrderTask(this)">
+                                    <label class="form-check-label" for="flexSwitchCheckOrderBy">Order by Risk</label>
+                                </div>
+                            }
+                        </div>
                         <div class="row">
                             @foreach (var risk in phase?.value?.Risks)
                             {
@@ -96,6 +83,13 @@
         }
     </div>
 </div>
+
+
+<script>
+    function OrderTask(element) {
+        LoadProjectPhasesOrder(element.checked);
+    };
+</script>
 
 
 

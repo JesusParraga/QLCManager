@@ -14,7 +14,7 @@
 
         public enum RiskProbabilityEnum
         {
-            NONE = 0,
+            //NONE = 0,
             RARE = 1,
             UNLIKELY = 2,
             POSSIBLE = 3,
@@ -24,7 +24,7 @@
 
         public enum RiskImpactEnum
         {
-            NONE = 0,
+            //NONE = 0,
             INSIGNIFICAT = 1,
             MINOR = 2,
             MODERATE = 3,
@@ -34,7 +34,7 @@
 
         public enum RiskLevelEnum
         {
-            NONE = 0,
+            //NONE = 0,
             LOW = 1, 
             MEDIUM = 2, 
             HIGH = 3, 

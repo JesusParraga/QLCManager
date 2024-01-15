@@ -132,6 +132,21 @@
                 });
             }
 
+            function LoadProjectPhasesOrder(order) {
+                $.ajax({
+                    url: '/Risks/GetPhasesAndRiskByProject',
+                    type: 'GET',
+                    data: { id: @Model.ProjectId, orderByRiskLevel: order },
+                    success: function (data) {
+                        $('#projectPhases').html(data);
+                        $("#flexSwitchCheckOrderBy").prop("checked", order);
+                    },
+                    error: function () {
+                        alert('Error occurred while fetching data.');
+                    }
+                });
+            }
+
             function LoadProjectHistoric() {
                 $.ajax({
                     url: '/Risks/GetProjectHistoric',

@@ -30,9 +30,9 @@ namespace RiskDashBoard.Controllers
             return View(nameof(Index), project);
         }
 
-        public async Task<IActionResult> GetPhasesAndRiskByProject(int id)
+        public async Task<IActionResult> GetPhasesAndRiskByProject(int id, bool orderByRiskLevel = false)
         {
-            Project? project = await GetProjectPhasesInfo(id).ConfigureAwait(false);
+            Project? project = await GetProjectPhasesInfo(id, orderByRiskLevel).ConfigureAwait(false);
 
             return PartialView("_ProjectPhases",project?.Phases);
         }
@@ -449,13 +449,19 @@ namespace RiskDashBoard.Controllers
             }
         }
 
-        private async Task<Project?> GetProjectPhasesInfo(int id)
+        private async Task<Project?> GetProjectPhasesInfo(int id, bool orderByRiskLevel = false)
         {
             Project? project = await _context.Projects.Include(x => x.Phases)?.ThenInclude(p => p.PhaseTypes).Include(x => x.Phases).ThenInclude(p => p.Risks)?.FirstOrDefaultAsync(x => x.ProjectId == id);
 
             var totalOperation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.OPERATION);
             var totalDevelopment = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.DEVELOPMENT);
             var totalFoundation = project.Phases.SelectMany(p => p.PhaseTypes).Count(pt => pt.PhaseTypeName == (int)StaticInfo.ProjectPhasesEnum.FOUNDATIONS);
+
+            if (orderByRiskLevel)
+            {
+                project.Phases.First(p => p.IsCurrentPhase).Risks = project.Phases.First(p => p.IsCurrentPhase).Risks.OrderByDescending(r => r.RiskLevel).ToList();
+            }
+
             return project;
         }
 
