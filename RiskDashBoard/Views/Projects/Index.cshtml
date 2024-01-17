@@ -25,9 +25,9 @@
 
                     @foreach (var phaseType in @item.Phases?.FirstOrDefault(x => x.IsCurrentPhase)?.PhaseTypes)
                     {
-                        <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0" style="margin-right:2px">@phaseType.PhaseTypeNameDescription</span>
+                        <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0" style="margin-right:2px; font-size:x-small">@phaseType.PhaseTypeNameDescription</span>
                     }
-                   
+          
                     <div class="card-body">
                         <h5 class="card-title" style="padding-top:15px;">@(item.ProjectName.Length > 45 ? @item.ProjectName.Substring(0, 45) + "..." : item.ProjectName)</h5>
                         <p class="card-text"></p>

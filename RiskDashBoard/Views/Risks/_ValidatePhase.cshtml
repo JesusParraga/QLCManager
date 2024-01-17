@@ -1,98 +1,98 @@
 ﻿@using RiskDashBoard.Resources
 @model RiskDashBoard.Models.ViewModels.PhaseViewModel
 
-<div class="card-group">
-    <div class="card mb-3" style="max-width: 540px;">
-        <div class="row no-gutters">
-            <div class="card-body" style="margin-left:5px">
-                <h5 class="card-title">Summary of Risks</h5>
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">LOW Rirsk</div>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">@Model.NumberLowRisk</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">MEDIUM Risk</div>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">@Model.NumberMediumRisk</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">HIGH Risk</div>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">@Model.NumberHighRisk</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">BLOKER Risk</div>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">@Model.NumberBlockerRisk</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="card mb-3" style="max-width: 540px;">
-        <div class="row no-gutters">
-            <div class="card-body">
-                <h5 class="card-title">
-                    Phase analysis
-                </h5>
-                <p class="card-text">After analysis, in the current situation of the phase, our proposal, base in the risk list that you have, is:</p>
-                @Html.DropDownListFor(model => model.RiskTypeDecission, Enum.GetValues(typeof(RiskTypeEnum)).Cast<RiskTypeEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value=((int)r).ToString()}), new { @class = "form-control", @id = "dropDownDecission" })
-            </div>
-        </div>
-        <div class="row" style="margin-left:10px">
-            @if (@Model.IsExplorationPhaseEnabled)
-            {
-                <div class="form-check form-switch col-6">
-                    <input asp-for=@Model.IsExplorationPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckExploration">
-                    <label class="form-check-label" for="flexSwitchCheckExploration">EXPLORATION</label>
-                </div>
-            }
-            @if (@Model.IsValuationPhaseEnabled)
-            {
-                <div class="form-check form-switch col-6">
-                    <input asp-for=@Model.IsValuationPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckValuation">
-                    <label class="form-check-label" for="flexSwitchCheckValuation">VALUATION</label>
-                </div>
-            }            
-            @if (@Model.IsFoundationsPhaseEnabled)
-            {
-                <div class="form-check form-switch col-6">
-                    <input asp-for=@Model.IsFoundationsPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckFoundations">
-                    <label class="form-check-label" for="flexSwitchCheckFoundations">FOUNDATIONS</label>
-                </div>
-            }
-            @if (@Model.IsDevelopmentPhaseEnabled)
-            {
-                <div class="form-check form-switch col-6">
-                    <input asp-for=@Model.IsDevelopmentPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckDevelopment">
-                    <label class="form-check-label" for="flexSwitchCheckDevelopment">DEVELOPMENT</label>
-                </div>
-            }
-            @if (@Model.IsOperationPhaseEnabled)
-            {
-                <div class="form-check form-switch col-6">
-                    <input asp-for=@Model.IsOperationPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckOperation">
-                    <label class="form-check-label" for="flexSwitchCheckOperation">OPERATION</label>
-                </div>
-            }
-        </div>
-        <div class="row">
-            <textarea id="phaseComments" class="form-control"></textarea>
-        </div>
-        <div class="row">
-            <div class="form-group" style="margin-top:15px; text-align:center">
-                <button type="button" id="@Model.PhaseId" onclick="BackPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-backward-step" style="margin-right:5px"></i>Previous phase</button>
-                <button type="button" id="@Model.PhaseId" onclick="NextPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-">Next phase<i class="fa-solid fa-forward-step" style="margin-left:5px"></i></button>
-            </div>
+
+<div class="card border-0 mb-3">
+    <div class="row no-gutters">
+        <div class="card-body" style="margin-left:5px">
+            <h5 class="card-title">Summary of Risks</h5>
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">LOW Rirsk</div>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">@Model.NumberLowRisk</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">MEDIUM Risk</div>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">@Model.NumberMediumRisk</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">HIGH Risk</div>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">@Model.NumberHighRisk</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">BLOKER Risk</div>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">@Model.NumberBlockerRisk</span>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
+<div class="card border-0 mb-3">
+    <div class="row no-gutters">
+        <div class="card-body">
+            <h5 class="card-title">
+                Phase analysis
+            </h5>
+            <p class="card-text">After analysis, in the current situation of the phase, our proposal, base in the risk list that you have, is:</p>
+            @Html.DropDownListFor(model => model.RiskTypeDecission, Enum.GetValues(typeof(RiskTypeEnum)).Cast<RiskTypeEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value=((int)r).ToString()}), new { @class = "form-control", @id = "dropDownDecission" })
+        </div>
+    </div>
+    <div class="row" style="margin-left:10px">
+        @if (@Model.IsExplorationPhaseEnabled)
+        {
+            <div class="form-check form-switch col-3">
+                <input asp-for=@Model.IsExplorationPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckExploration">
+                <label class="form-check-label" for="flexSwitchCheckExploration">EXPLORATION</label>
+            </div>
+        }
+        @if (@Model.IsValuationPhaseEnabled)
+        {
+            <div class="form-check form-switch col-3">
+                <input asp-for=@Model.IsValuationPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckValuation">
+                <label class="form-check-label" for="flexSwitchCheckValuation">VALUATION</label>
+            </div>
+        }            
+        @if (@Model.IsFoundationsPhaseEnabled)
+        {
+            <div class="form-check form-switch col-3">
+                <input asp-for=@Model.IsFoundationsPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckFoundations">
+                <label class="form-check-label" for="flexSwitchCheckFoundations">FOUNDATIONS</label>
+            </div>
+        }
+        @if (@Model.IsDevelopmentPhaseEnabled)
+        {
+            <div class="form-check form-switch col-3">
+                <input asp-for=@Model.IsDevelopmentPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckDevelopment">
+                <label class="form-check-label" for="flexSwitchCheckDevelopment">DEVELOPMENT</label>
+            </div>
+        }
+        @if (@Model.IsOperationPhaseEnabled)
+        {
+            <div class="form-check form-switch col-3">
+                <input asp-for=@Model.IsOperationPhaseChecked class="form-check-input" type="checkbox" role="checkbox" id="flexSwitchCheckOperation">
+                <label class="form-check-label" for="flexSwitchCheckOperation">OPERATION</label>
+            </div>
+        }
+    </div>
+    <div class="row" style="margin-left:5px; margin-right:5px; margin-top: 10px">
+        <textarea id="phaseComments" class="form-control"></textarea>
+    </div>
+    <div class="row">
+        <div class="form-group" style="margin-top:15px; text-align:center">
+            <button type="button" id="@Model.PhaseId" onclick="BackPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-backward-step" style="margin-right:5px"></i>Previous phase</button>
+            <button type="button" id="@Model.PhaseId" onclick="NextPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-">Next phase<i class="fa-solid fa-forward-step" style="margin-left:5px"></i></button>
+        </div>
+    </div>
+</div>
+
 
 <script>
     function NextPhase(PhaseId, ProjectId) {
@@ -122,8 +122,7 @@
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');
                 //$("#projectPhases").html(data);
-                LoadProjectPhases();
-                LoadProjectHistoric();
+                RefreshPhaseTimeLinePage();
             }
         });
     };

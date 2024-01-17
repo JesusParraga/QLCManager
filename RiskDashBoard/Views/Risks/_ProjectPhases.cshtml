@@ -59,6 +59,7 @@
                                 <div class="card @(border) mb-3 border-2" style="max-width: 18rem; margin-left: 20px;">
                                     <div class="card-body">
                                         <h5 class="card-title">@risk.RiskId - @risk.RiskName</h5>
+                                        <h6>Risk level: @risk.RiskLevelName</h6>
                                         <p class="card-text">@(risk.RiskDescription?.Length > 60 ? risk.RiskDescription.Substring(0,60) + "...":risk.RiskDescription)</p>
                                     </div>
                                     <div class="card-footer" style="margin-left:-12px; margin-right:-12px">
