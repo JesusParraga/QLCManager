@@ -26,10 +26,10 @@ namespace RiskDashBoard.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Project>().HasMany(x => x.Users).WithMany(x => x.Projects).UsingEntity(x => x.ToTable("UserProject"));
-            modelBuilder.Entity<Phase>().HasMany(x => x.Risks).WithMany(x => x.Phases).UsingEntity(x => x.ToTable("PhaseRisk"));
             modelBuilder.Entity<Phase>().HasMany(x => x.PhaseTypes).WithMany(x => x.Phases).UsingEntity(x => x.ToTable("PhasePhasesType"));
             modelBuilder.Entity<Phase>().HasOne(x => x.Project).WithMany(x => x.Phases).HasForeignKey(x => x.ProjectId).HasConstraintName("FK_ProjectPhase");
             modelBuilder.Entity<Risk>().HasMany(x => x.Tags).WithMany(x => x.Risks).UsingEntity(x => x.ToTable("RiskTag"));
+            modelBuilder.Entity<Risk>().HasOne(x => x.Phase).WithMany(x => x.Risks).HasForeignKey(x => x.PhaseId).HasConstraintName("FK_RiskPhase");
             modelBuilder.Entity<Comment>().HasOne(x=> x.Risk).WithMany(x => x.Comments).HasForeignKey(x => x.RiskId).HasConstraintName("FJ_CommentRisk");
             modelBuilder.Entity<PhaseType>().HasMany(x => x.Risks).WithMany(x => x.PhasesType).UsingEntity(x => x.ToTable("PhaseTypeRisk"));
             modelBuilder.Entity<HistoricPhase>().HasOne(x => x.Project).WithMany(x => x.HistoricPhases).HasForeignKey(x => x.ProjectId).HasConstraintName("FK_HistoricProject");

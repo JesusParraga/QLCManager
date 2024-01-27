@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RiskDashBoard.Context;
 
@@ -11,9 +12,11 @@ using RiskDashBoard.Context;
 namespace RiskDashBoard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240127080016_RiskProposal")]
+    partial class RiskProposal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,6 +38,21 @@ namespace RiskDashBoard.Migrations
                     b.HasIndex("PhasesPhaseId");
 
                     b.ToTable("PhasePhasesType", (string)null);
+                });
+
+            modelBuilder.Entity("PhaseRisk", b =>
+                {
+                    b.Property<int>("PhasesPhaseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RisksRiskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PhasesPhaseId", "RisksRiskId");
+
+                    b.HasIndex("RisksRiskId");
+
+                    b.ToTable("PhaseRisk", (string)null);
                 });
 
             modelBuilder.Entity("PhaseTypeRisk", b =>
@@ -217,10 +235,7 @@ namespace RiskDashBoard.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RiskId"));
 
-                    b.Property<int?>("PhaseId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Resolved")
+                    b.Property<bool>("Resolve")
                         .HasColumnType("bit");
 
                     b.Property<string>("RiskDescription")
@@ -238,8 +253,6 @@ namespace RiskDashBoard.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("RiskId");
-
-                    b.HasIndex("PhaseId");
 
                     b.ToTable("Risks");
                 });
@@ -320,6 +333,21 @@ namespace RiskDashBoard.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PhaseRisk", b =>
+                {
+                    b.HasOne("RiskDashBoard.Models.Phase", null)
+                        .WithMany()
+                        .HasForeignKey("PhasesPhaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RiskDashBoard.Models.Risk", null)
+                        .WithMany()
+                        .HasForeignKey("RisksRiskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("PhaseTypeRisk", b =>
                 {
                     b.HasOne("RiskDashBoard.Models.PhaseType", null)
@@ -386,16 +414,6 @@ namespace RiskDashBoard.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("RiskDashBoard.Models.Risk", b =>
-                {
-                    b.HasOne("RiskDashBoard.Models.Phase", "Phase")
-                        .WithMany("Risks")
-                        .HasForeignKey("PhaseId")
-                        .HasConstraintName("FK_RiskPhase");
-
-                    b.Navigation("Phase");
-                });
-
             modelBuilder.Entity("RiskTag", b =>
                 {
                     b.HasOne("RiskDashBoard.Models.Risk", null)
@@ -409,11 +427,6 @@ namespace RiskDashBoard.Migrations
                         .HasForeignKey("TagsTagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("RiskDashBoard.Models.Phase", b =>
-                {
-                    b.Navigation("Risks");
                 });
 
             modelBuilder.Entity("RiskDashBoard.Models.Project", b =>

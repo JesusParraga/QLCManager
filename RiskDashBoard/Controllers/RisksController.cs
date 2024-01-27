@@ -82,7 +82,7 @@ namespace RiskDashBoard.Controllers
         {
             if (ModelState.IsValid)
             {
-                var newRisk = new Risk { RiskDescription = risk.RiskDescription, RiskProbability = risk.RiskProbability, RiskImpact = risk.RiskImpact, RiskName = risk.RiskName };
+                var newRisk = new Risk { RiskDescription = risk.RiskDescription, RiskProbability = risk.RiskProbability, RiskImpact = risk.RiskImpact, RiskName = risk.RiskName, Resolved = false};
                 _context.Risks.Add(newRisk);
                 await _context.SaveChangesAsync();
 
@@ -119,7 +119,8 @@ namespace RiskDashBoard.Controllers
                 RiskProbability = risk.RiskProbability,
                 RiskName = risk.RiskName,
                 RiskDescription = risk.RiskDescription,
-                ProjectId = idProy
+                ProjectId = idProy,
+                Resolved = risk.Resolved
             };
 
             return View(riskViewModel);
@@ -130,7 +131,7 @@ namespace RiskDashBoard.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RiskId,RiskName,RiskDescription,RiskType,RiskProbability,RiskImpact,ProjectId")] RiskViewModel risk)
+        public async Task<IActionResult> Edit(int id, [Bind("RiskId,RiskName,RiskDescription,RiskType,RiskProbability,RiskImpact,ProjectId,Resolved")] RiskViewModel risk)
         {
             if (id != risk.RiskId)
             {
@@ -146,6 +147,7 @@ namespace RiskDashBoard.Controllers
                     riskToUpdate.RiskImpact = risk.RiskImpact;
                     riskToUpdate.RiskProbability = risk.RiskProbability;
                     riskToUpdate.RiskName = risk.RiskName;
+                    riskToUpdate.Resolved = risk.Resolved;
                     _context.Update(riskToUpdate);
                     await _context.SaveChangesAsync();
                 }
@@ -236,10 +238,12 @@ namespace RiskDashBoard.Controllers
                     phaseViewModel.IsOperationPhaseEnabled = false;
                 }
 
-                phaseViewModel.RiskTypeDecission = blocker >= 1 ? RiskTypeEnum.Unaddressable.ToString() : 
-                    high > 5 ? RiskTypeEnum.Negligible.ToString() : 
-                    medium >= 5 ? RiskTypeEnum.Addressable.ToString() : 
-                    RiskTypeEnum.Acceptable.ToString();
+                phaseViewModel.RiskTypeDecission = blocker >= 1 ? (int)RiskTypeEnum.Negligible : 
+                    high > 5 ? (int)RiskTypeEnum.Unaddressable : 
+                    medium >= 5 ? (int)RiskTypeEnum.Addressable : 
+                    (int)RiskTypeEnum.Acceptable;
+
+                phaseViewModel.ProposalRiskDecission = ((RiskTypeEnum)phaseViewModel.RiskTypeDecission).ToString();
 
                 return PartialView("_ValidatePhase", phaseViewModel);
             }
@@ -307,12 +311,12 @@ namespace RiskDashBoard.Controllers
                 }
             }
         }
-        
-        public async Task<IActionResult> NextPhase(int id, int idProject,bool checkFoundations, bool checkDevelopment, bool checkOperation, string comments, int decissionId)
+     
+        public async Task<IActionResult> NextPhase(int id, int idProject,bool checkFoundations, bool checkDevelopment, bool checkOperation, string comments, int decissionId, string proposalRiskDecission)
         {
             var UserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
             var UserName = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
-            var project = await _context.Projects.Include(p=> p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
+            var project = await _context.Projects.Include(p=> p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).Include(p => p.Phases).ThenInclude(ph => ph.Risks).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
             var phase = project.Phases.OrderBy(ph => ph.PhaseId).Select((p, i) => new {phase = p, index = i }).FirstOrDefault(p => p.phase.PhaseId == id);
             var newHistoricProject = new HistoricPhase { 
                 Date = DateTime.UtcNow, 
@@ -321,8 +325,9 @@ namespace RiskDashBoard.Controllers
                 UserId = int.Parse(UserId),
                 UserName = UserName,
                 Comments = comments,
-                DecissionId = decissionId
-            };
+                DecissionId = decissionId,
+                ProposalRiskDecission = (int)(RiskTypeEnum)Enum.Parse(typeof(RiskTypeEnum), proposalRiskDecission)
+        };
             
 
             if (phase != null && project.Phases.OrderBy(ph => ph.PhaseId).ElementAtOrDefault(phase.index + 1) != null)
@@ -332,7 +337,9 @@ namespace RiskDashBoard.Controllers
                 project.Phases.ElementAt(phase.index + 1).IsCurrentPhase = true;
                 newHistoricProject.CurrentPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
 
-                project.HistoricPhases.Add(newHistoricProject);
+                MoveRiskBetweenPhases(project);
+
+                project.HistoricPhases?.Add(newHistoricProject);
                 _context.SaveChanges();
             }
             else if (phase != null)
@@ -363,18 +370,21 @@ namespace RiskDashBoard.Controllers
                         ProjectId = idProject,
 
                     });
+                    _context.SaveChanges();
                 }
 
                 project.HistoricPhases.Add(newHistoricProject);
+                MoveRiskBetweenPhases(project);
                 _context.SaveChanges();
             }
 
             return RedirectToAction("GetPhasesAndRiskByProject", "Risks", new { id = idProject });
         }
 
-        public async Task<IActionResult> BackPhase(int id, int idProject, string comments, int decissionId)
+
+        public async Task<IActionResult> BackPhase(int id, int idProject, string comments, int decissionId, string proposalRiskDecission)
         {
-            var project = await _context.Projects.Include(p => p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
+            var project = await _context.Projects.Include(p => p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).Include(p=> p.Phases).ThenInclude(ph => ph.Risks).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
             var phase = project.Phases.OrderBy(ph => ph.PhaseId).Select((p, i) => new { phase = p, index = i }).FirstOrDefault(p => p.phase.PhaseId == id);
 
             if (phase != null && phase.index > 0)
@@ -390,7 +400,9 @@ namespace RiskDashBoard.Controllers
                     UserId = int.Parse(UserId),
                     UserName = UserName,
                     Comments = comments,
-                    DecissionId = decissionId
+                    DecissionId = decissionId,
+                    ProposalRiskDecission = (int)(RiskTypeEnum)Enum.Parse(typeof(RiskTypeEnum), proposalRiskDecission)
+
                 };
 
                 newHistoricProject.PreviousPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
@@ -398,6 +410,8 @@ namespace RiskDashBoard.Controllers
                 project.Phases.ElementAt(phase.index - 1).IsCurrentPhase = true;
                 newHistoricProject.CurrentPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
                 project.HistoricPhases.Add(newHistoricProject);
+
+                MoveRiskBetweenPhases(project);
 
                 _context.SaveChanges();
             }
@@ -554,6 +568,12 @@ namespace RiskDashBoard.Controllers
                 phaseViewModel.IsDevelopmentPhaseEnabled = true;
                 phaseViewModel.IsOperationPhaseEnabled = true;
             }
+        }
+
+        private static void MoveRiskBetweenPhases(Project? project)
+        {
+            var phaseId = project.Phases.First(p => p.IsCurrentPhase).PhaseId;
+            project.Phases.Where(ph => ph.Risks != null).SelectMany(p => p.Risks?.Where(r => !r.Resolved)).ToList().ForEach(r => r.PhaseId = phaseId);
         }
     }
 }

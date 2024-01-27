@@ -17,13 +17,16 @@ namespace RiskDashBoard.Models
         public string? UserName { get; set; }
         public DateTime? Date { get; set; }
         public bool IsBack { get; set; }
-
         public int DecissionId { get; set; }
+        public int ProposalRiskDecission {  get; set; }
 
         [NotMapped]
         public string HumanizedDate => (DateTime.Now - Date).Value.Humanize(culture: new CultureInfo("en-En"));
 
         [NotMapped]
         public string DecissionDescription => ((RiskTypeEnum)DecissionId).ToString();
+
+        [NotMapped]
+        public string DecissionProposalDescription => ((RiskTypeEnum)ProposalRiskDecission).ToString();
     }
 }

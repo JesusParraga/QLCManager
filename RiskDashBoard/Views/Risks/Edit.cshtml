@@ -23,17 +23,22 @@
             <div class="col-2">
                 <div class="form-group">
                     <label asp-for="RiskProbability" class="control-label"></label>
-                    @* <input asp-for="RiskProbability" class="form-control" min="0" max="100" type="number" step="5" /> *@
-                    @Html.DropDownListFor(model => model.RiskProbability, Enum.GetValues(typeof(RiskProbabilityEnum)).Cast<RiskProbabilityEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value = ((int)r).ToString() }), new { @class = "form-control", @id = "dropDownDecission" })
+                    @Html.DropDownListFor(model => model.RiskProbability, Enum.GetValues(typeof(RiskProbabilityEnum)).Cast<RiskProbabilityEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value = ((int)r).ToString() }), new { @class = "form-control", @id = "dropDownProbability" })
                     <span asp-validation-for="RiskProbability" class="text-danger"></span>
                 </div>
             </div>
             <div class="col-3">
                 <div class="form-group">
                     <label asp-for="RiskImpact" class="control-label"></label>
-                    @*<input asp-for="RiskImpact" class="form-control" /> *@
-                    @Html.DropDownListFor(model => model.RiskImpact, Enum.GetValues(typeof(RiskImpactEnum)).Cast<RiskImpactEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value = ((int)r).ToString() }), new { @class = "form-control", @id = "dropDownDecission" })
+                    @Html.DropDownListFor(model => model.RiskImpact, Enum.GetValues(typeof(RiskImpactEnum)).Cast<RiskImpactEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value = ((int)r).ToString() }), new { @class = "form-control", @id = "dropDownImpact" })
                     <span asp-validation-for="RiskImpact" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="form-group">
+                    <label asp-for="Resolved" class="control-label"></label>
+                    @Html.DropDownListFor(model => model.Resolved, Enum.GetValues(typeof(RiskStatusEnum)).Cast<RiskStatusEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value = Convert.ToBoolean(r).ToString() }), new { @class = "form-control", @id = "dropDownResolved" })
+                    <span asp-validation-for="Resolved" class="text-danger"></span>
                 </div>
             </div>
         </div>

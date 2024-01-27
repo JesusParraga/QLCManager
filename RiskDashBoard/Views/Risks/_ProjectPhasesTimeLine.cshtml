@@ -1,4 +1,5 @@
-﻿@model IEnumerable<RiskDashBoard.Models.HistoricPhase>
+﻿@using RiskDashBoard.Resources
+@model IEnumerable<RiskDashBoard.Models.HistoricPhase>
 
 <style>
     .timeline {
@@ -190,7 +191,17 @@
 @*     <div class="page-header">
         <h1 id="timeline">Timeline</h1>
     </div> *@
-    <ul class="timeline" style="margin-top:10px">
+
+    <div class="row" style="margin-top:10px; text-align:center">
+        <span class="col-2">Decission taken:</span>
+        <span class="col-1 badge rounded-pill bg-secondary" style="margin-right: 5px">Negligible</span>
+        <span class="col-1 badge rounded-pill bg-warning" style="margin-right: 5px">Unaddressable</span>
+        <span class="col-1 badge rounded-pill bg-primary" style="margin-right: 5px">Addressable</span>
+        <span class="col-1 badge rounded-pill bg-success" style="margin-right: 5px">Acceptable</span>
+    </div>
+
+
+    <ul class="timeline" style="margin-top:5px">
         @foreach (var historic in Model.Select((value, i) => new {i, value}))
         {
             <li class="@(historic.i % 2 == 0 ? "timeline-inverted":"")">
@@ -208,8 +219,11 @@
                             @historic.value.CurrentPhaseType
                         </h4>
                         <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> @historic.value.HumanizedDate ago</small></p>
+                        <span class="badge rounded-pill @(historic.value.ProposalRiskDecission == (int)RiskTypeEnum.Acceptable ? "bg-success":
+                        historic.value.ProposalRiskDecission == (int)RiskTypeEnum.Addressable ? "bg-primary":
+                        historic.value.ProposalRiskDecission == (int)RiskTypeEnum.Unaddressable  ? "bg-warning":"bg-secondary")"> The decission proposal was: @historic.value.DecissionProposalDescription</span>
                     </div>
-                    <div class="timeline-body">
+                    <div class="timeline-body" style="margin-top:5px">
                         <p>@historic.value.Comments</p>
                     </div>
                 </div>

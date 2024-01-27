@@ -9,15 +9,9 @@
             <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">
-                        <div class="fw-bold">LOW Rirsk</div>
+                        <div class="fw-bold">BLOCKER Risk</div>
                     </div>
-                    <span class="badge bg-primary rounded-pill">@Model.NumberLowRisk</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
-                        <div class="fw-bold">MEDIUM Risk</div>
-                    </div>
-                    <span class="badge bg-primary rounded-pill">@Model.NumberMediumRisk</span>
+                    <span class="badge bg-primary rounded-pill">@Model.NumberBlockerRisk</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">
@@ -27,9 +21,15 @@
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">
-                        <div class="fw-bold">BLOKER Risk</div>
+                        <div class="fw-bold">MEDIUM Risk</div>
                     </div>
-                    <span class="badge bg-primary rounded-pill">@Model.NumberBlockerRisk</span>
+                    <span class="badge bg-primary rounded-pill">@Model.NumberMediumRisk</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">LOW Rirsk</div>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">@Model.NumberLowRisk</span>
                 </li>
             </ul>
         </div>
@@ -41,7 +41,7 @@
             <h5 class="card-title">
                 Phase analysis
             </h5>
-            <p class="card-text">After analysis, in the current situation of the phase, our proposal, base in the risk list that you have, is:</p>
+            <p class="card-text">After analysis, in the current situation of the phase, our proposal, base in the risk list that you have, is: <span id="spanProposalRiskDecission" style="font-weight: bold">@Model.ProposalRiskDecission</span> </p>
             @Html.DropDownListFor(model => model.RiskTypeDecission, Enum.GetValues(typeof(RiskTypeEnum)).Cast<RiskTypeEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value=((int)r).ToString()}), new { @class = "form-control", @id = "dropDownDecission" })
         </div>
     </div>
@@ -97,14 +97,12 @@
 <script>
     function NextPhase(PhaseId, ProjectId) {
 
-        // var checkExploration = $('#flexSwitchCheckExploration').val();
-        // var checkValuation = $('#flexSwitchCheckValuation').val();
         var checkFoundations = $('#flexSwitchCheckFoundations').is(':checked');
         var checkDevelopment = $('#flexSwitchCheckDevelopment').is(':checked');
         var checkOperation = $('#flexSwitchCheckOperation').is(':checked');
         var phaseComments = $('#phaseComments').val();
         var decissionSelectedId = $('#dropDownDecission').val();
-        //var decissionSelectedId = $("#dropDownDecission option:selected").text();
+        var proposalRiskDecission = $('#spanProposalRiskDecission').text();
 
 
         $.ajax({
@@ -117,7 +115,8 @@
                 checkDevelopment: checkDevelopment,
                 checkOperation: checkOperation,
                 comments: phaseComments,
-                decissionId: decissionSelectedId
+                decissionId: decissionSelectedId,
+                proposalRiskDecission: proposalRiskDecission
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');
@@ -131,6 +130,8 @@
 
         var phaseComments = $('#phaseComments').val();
         var decissionSelectedId = $('#dropDownDecission').val();
+        var proposalRiskDecission = $('#spanProposalRiskDecission').text();
+        console.log
 
         $.ajax({
             url: "/Risks/BackPhase",
@@ -139,7 +140,8 @@
                 id: PhaseId,
                 idProject: ProjectId,
                 comments: phaseComments,
-                decissionId: decissionSelectedId
+                decissionId: decissionSelectedId,
+                proposalRiskDecission: proposalRiskDecission
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');

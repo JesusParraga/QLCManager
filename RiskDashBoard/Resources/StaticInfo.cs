@@ -28,7 +28,7 @@
             INSIGNIFICAT = 1,
             MINOR = 2,
             MODERATE = 3,
-            ELDERLY = 4,
+            MAYOR = 4,
             CATASTROHIC = 5
         }
 
@@ -39,6 +39,12 @@
             MEDIUM = 2, 
             HIGH = 3, 
             BLOCKER = 4
+        }
+
+        public enum RiskStatusEnum
+        {
+            PENDING = 0,
+            RESOLVED = 1
         }
     }
 }

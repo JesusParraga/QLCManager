@@ -16,8 +16,10 @@ namespace RiskDashBoard.Models
         public int RiskProbability { get; set; }
         [Required]
         public int RiskImpact {  get; set; }
+        public bool Resolved {  get; set; }
         public ICollection<Comment>? Comments { get; set; }
-        public ICollection<Phase>? Phases { get; set; }
+        public Phase Phase { get; set; }
+        public int? PhaseId { get; set; }
         public ICollection<Tag>? Tags { get; set; }
         public ICollection<PhaseType>? PhasesType { get; set; }
 
@@ -73,7 +75,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.LOW;
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.LOW;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.MEDIUM;
-                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.MEDIUM;
             }
 
@@ -82,7 +84,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.LOW;
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.LOW;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.MEDIUM;
-                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.HIGH;
             }
 
@@ -91,7 +93,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.LOW;
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.MEDIUM;
-                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.HIGH;
+                if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.HIGH;
                 if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.HIGH;
             }
 
@@ -100,7 +102,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.HIGH;
-                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.HIGH;
+                if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.HIGH;
                 if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.BLOCKER;
             }
 
@@ -109,7 +111,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.INSIGNIFICAT) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.HIGH;
-                if (RiskImpact == (int)RiskImpactEnum.ELDERLY) return (int)RiskLevelEnum.BLOCKER;
+                if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.BLOCKER;
                 if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.BLOCKER;
             }
 

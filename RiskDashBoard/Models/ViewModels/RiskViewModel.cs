@@ -16,6 +16,8 @@ namespace RiskDashBoard.Models.ViewModels
         public int RiskImpact { get; set; }
         [Required]
         public int PhaseId { get; set; }
+        [Required]
+        public bool Resolved { get; set; }
 
         public int ProjectId { get; set; }
     }

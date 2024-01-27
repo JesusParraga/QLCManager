@@ -5,7 +5,7 @@
         public int PhaseId { get; set; }
         public bool IsCurrentPhase { get; set; }
         public int ProjectId { get; set; }
-        public string? RiskTypeDecission { get; set; }
+        public int RiskTypeDecission { get; set; }
         public List<PhaseType> PhaseTypes { get; set; } 
         public int NumberLowRisk { get; set; }
         public int NumberMediumRisk { get; set; }
@@ -21,5 +21,6 @@
         public bool IsFoundationsPhaseEnabled { get; set; }
         public bool IsDevelopmentPhaseEnabled { get; set; }
         public bool IsOperationPhaseEnabled { get; set; }
+        public string? ProposalRiskDecission { get; set; }
     }
 }
