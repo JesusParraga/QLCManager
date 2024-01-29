@@ -37,7 +37,7 @@
                             <i class="fa fa-chevron-down pull-right"></i>
                             @foreach (var phaseType in @phase?.value?.PhaseTypes)
                             {
-                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0" style="margin-right:5px">@phaseType.PhaseTypeNameDescription</span>
+                                <span class="badge rounded-pill bg-primary float-md-end mb-3 mb-sm-0" style="margin-right:5px">@phaseType.PhaseTypeNameDescription - @phase.value.IterationNumber</span>
                             }
                         </a>
                     </h5>

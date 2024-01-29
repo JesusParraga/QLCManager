@@ -39,7 +39,7 @@ namespace RiskDashBoard.Controllers
 
         public async Task<IActionResult> GetProjectHistoric(int id)
         {
-            var historicProject = await _context.HistoricPhases.Where(h => h.ProjectId == id).ToListAsync().ConfigureAwait(false);
+            var historicProject = await _context.HistoricPhases.Where(h => h.ProjectId == id).OrderByDescending(h => h.Date).ToListAsync().ConfigureAwait(false);
 
             return PartialView("_ProjectPhasesTimeLine", historicProject);
         }
@@ -142,12 +142,13 @@ namespace RiskDashBoard.Controllers
             {
                 try
                 {
-                    var riskToUpdate = await _context.Risks.FirstAsync(r => id == r.RiskId);
+                    var riskToUpdate = await _context.Risks.Include(r => r.Comments).FirstAsync(r => id == r.RiskId);
+                    AddEditComment(riskToUpdate, risk);
                     riskToUpdate.RiskDescription = risk.RiskDescription;
                     riskToUpdate.RiskImpact = risk.RiskImpact;
                     riskToUpdate.RiskProbability = risk.RiskProbability;
                     riskToUpdate.RiskName = risk.RiskName;
-                    riskToUpdate.Resolved = risk.Resolved;
+                    riskToUpdate.Resolved = risk.Resolved;               
                     _context.Update(riskToUpdate);
                     await _context.SaveChangesAsync();
                 }
@@ -327,7 +328,7 @@ namespace RiskDashBoard.Controllers
                 Comments = comments,
                 DecissionId = decissionId,
                 ProposalRiskDecission = (int)(RiskTypeEnum)Enum.Parse(typeof(RiskTypeEnum), proposalRiskDecission)
-        };
+            };
             
 
             if (phase != null && project.Phases.OrderBy(ph => ph.PhaseId).ElementAtOrDefault(phase.index + 1) != null)
@@ -336,7 +337,7 @@ namespace RiskDashBoard.Controllers
                 project.Phases.First(p => p.IsCurrentPhase).IsCurrentPhase = false;
                 project.Phases.ElementAt(phase.index + 1).IsCurrentPhase = true;
                 newHistoricProject.CurrentPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
-
+                newHistoricProject.IterationPhaseNumber = project.Phases.First(p => p.IsCurrentPhase).IterationNumber;
                 MoveRiskBetweenPhases(project);
 
                 project.HistoricPhases?.Add(newHistoricProject);
@@ -351,24 +352,26 @@ namespace RiskDashBoard.Controllers
                 {
                     var nextPhase = await BasicCalculationNewPhase(phase.phase.PhaseTypes.First().PhaseTypeName).ConfigureAwait(false);
                     newHistoricProject.CurrentPhaseType = nextPhase.PhaseTypeNameDescription;
+                    newHistoricProject.IterationPhaseNumber = phase.index + 1;
                     project.Phases.Add(new Phase
                     {
                         PhaseTypes = new List<PhaseType> { nextPhase },
                         IsCurrentPhase = true,
                         ProjectId = idProject,
-
+                        IterationNumber = phase.index + 1
                     });
                 }
                 else
                 {
                     var nextPhase = await AdvancedCalculationNewPhase(checkFoundations, checkDevelopment, checkOperation).ConfigureAwait(false);
                     newHistoricProject.CurrentPhaseType = string.Join(",", nextPhase.Select(pt => pt.PhaseTypeNameDescription).ToList());
+                    newHistoricProject.IterationPhaseNumber = phase.index + 1;
                     project.Phases.Add(new Phase
                     {
                         PhaseTypes = nextPhase,
                         IsCurrentPhase = true,
                         ProjectId = idProject,
-
+                        IterationNumber = phase.index + 1
                     });
                     _context.SaveChanges();
                 }
@@ -380,7 +383,6 @@ namespace RiskDashBoard.Controllers
 
             return RedirectToAction("GetPhasesAndRiskByProject", "Risks", new { id = idProject });
         }
-
 
         public async Task<IActionResult> BackPhase(int id, int idProject, string comments, int decissionId, string proposalRiskDecission)
         {
@@ -401,8 +403,8 @@ namespace RiskDashBoard.Controllers
                     UserName = UserName,
                     Comments = comments,
                     DecissionId = decissionId,
-                    ProposalRiskDecission = (int)(RiskTypeEnum)Enum.Parse(typeof(RiskTypeEnum), proposalRiskDecission)
-
+                    ProposalRiskDecission = (int)(RiskTypeEnum)Enum.Parse(typeof(RiskTypeEnum), proposalRiskDecission),
+                    IterationPhaseNumber = phase.phase.IterationNumber
                 };
 
                 newHistoricProject.PreviousPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
@@ -450,13 +452,18 @@ namespace RiskDashBoard.Controllers
                 LastUpdatedAt = DateTime.Now,
                 UserComment = commentTxt,
                 UserId = userId,
-                UserName = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString())
+                UserName = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString()),
             };
 
             var risk = await _context.Risks.Include(r => r.Comments).FirstAsync(r => r.RiskId == idRisk).ConfigureAwait(false);
             if (risk != null)
             {
-                if (risk.Comments == null) { risk.Comments = new List<Comment>(); risk.Comments.Add(commentToAdd); }
+                if (risk.Comments == null) { 
+                    risk.Comments = new List<Comment>
+                    {
+                        commentToAdd
+                    }; 
+                }
                 else { risk.Comments.Add(commentToAdd); }
 
                 await _context.SaveChangesAsync().ConfigureAwait(false);
@@ -574,6 +581,55 @@ namespace RiskDashBoard.Controllers
         {
             var phaseId = project.Phases.First(p => p.IsCurrentPhase).PhaseId;
             project.Phases.Where(ph => ph.Risks != null).SelectMany(p => p.Risks?.Where(r => !r.Resolved)).ToList().ForEach(r => r.PhaseId = phaseId);
+        }
+
+        private void AddEditComment(Risk riskToUpdate, RiskViewModel risk)
+        {
+            string message = string.Empty; 
+
+            if (riskToUpdate.RiskName != risk.RiskName)
+            {
+                message = message + "Risk name was changed from: " + risk.RiskName + " to " + riskToUpdate.RiskName + "\n";
+            }
+
+            if (riskToUpdate.RiskDescription != risk.RiskDescription)
+            {
+                message = message + "Risk description was changed from: " + risk.RiskDescription + " to " + riskToUpdate.RiskDescription + "\n";
+            }
+
+            if (riskToUpdate.RiskImpact != risk.RiskImpact)
+            {
+                message = message + "Risk impact was changed from: " + ((StaticInfo.RiskImpactEnum)risk.RiskImpact).ToString() + " to " + ((StaticInfo.RiskImpactEnum)riskToUpdate.RiskImpact).ToString() + "\n";
+            }
+
+            if (riskToUpdate.RiskProbability != risk.RiskProbability)
+            {
+                message = message + "Risk probability was changed from: " + ((StaticInfo.RiskProbabilityEnum)risk.RiskProbability).ToString() + " to " + ((StaticInfo.RiskProbabilityEnum)riskToUpdate.RiskProbability).ToString() + "\n";
+            }
+
+            if (riskToUpdate.Resolved != risk.Resolved)
+            {
+                var txt = risk.Resolved == true ? "Resolved" : "In Progress";
+                var txtchanged = riskToUpdate.Resolved == true ? "Resolved" : "In Progress";
+                message = message + "Risk status was changed from: " + txt + " to " + txtchanged + "\n";
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                var UserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
+                var UserName = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
+
+                var comment = new Comment
+                {
+                    RiskId = riskToUpdate.RiskId,
+                    UserComment = message,
+                    UserId = int.Parse(UserId),
+                    UserName = UserName,
+                    LastUpdatedAt = DateTime.Now
+                };
+
+                riskToUpdate.Comments.Add(comment);
+            }
         }
     }
 }

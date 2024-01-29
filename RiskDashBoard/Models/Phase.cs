@@ -10,6 +10,7 @@ namespace RiskDashBoard.Models
         public int ProjectId { get; set; }
         public virtual Project? Project { get; set; }
         public int RiskTypeDecission { get; set; }
+        public int IterationNumber { get; set; }
         public ICollection<Risk>? Risks { get; set; }
         public ICollection<PhaseType>? PhaseTypes { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace RiskDashBoard.Models.ViewModels
 {
@@ -7,12 +8,16 @@ namespace RiskDashBoard.Models.ViewModels
         [Key]
         public int RiskId { get; set; }
         [Required]
+        [DisplayName("Title")]
         public string? RiskName { get; set; }
         [Required]
+        [DisplayName("Description")]
         public string? RiskDescription { get; set; }
         [Required]
+        [DisplayName("Probability")]
         public int RiskProbability { get; set; }
         [Required]
+        [DisplayName("Impact")]
         public int RiskImpact { get; set; }
         [Required]
         public int PhaseId { get; set; }

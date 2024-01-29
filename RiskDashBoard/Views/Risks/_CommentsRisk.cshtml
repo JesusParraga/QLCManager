@@ -29,7 +29,7 @@
                                 <div class="d-flex flex-row align-items-center commented-user">
                                     <h5 class="mr-2">@comment.UserName</h5><span class="mb-1 ml-2" style="margin-left:10px"> - @comment.TimeLapse ago</span>
                                 </div>
-                                <div class="comment-text-sm"><span>@comment.UserComment</span></div>
+                                <div class="comment-text-sm" style="white-space: pre-line"><span>@comment.UserComment</span></div>
                                 <div class="reply-section">
                                     <div class="d-flex flex-row align-items-center voting-icons">
                                         <a onclick="DeleteCommentToRisk(@comment.CommentId)"><i class="far fa-trash-alt"></i></a>

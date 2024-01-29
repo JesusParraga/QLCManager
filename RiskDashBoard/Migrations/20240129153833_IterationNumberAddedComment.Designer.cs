@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RiskDashBoard.Context;
 
@@ -11,9 +12,11 @@ using RiskDashBoard.Context;
 namespace RiskDashBoard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240129153833_IterationNumberAddedComment")]
+    partial class IterationNumberAddedComment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,6 +81,9 @@ namespace RiskDashBoard.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("IterationPhaseNumber")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("LastUpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -123,9 +129,6 @@ namespace RiskDashBoard.Migrations
 
                     b.Property<bool>("IsBack")
                         .HasColumnType("bit");
-
-                    b.Property<int>("IterationPhaseNumber")
-                        .HasColumnType("int");
 
                     b.Property<string>("PreviousPhaseType")
                         .HasColumnType("nvarchar(max)");

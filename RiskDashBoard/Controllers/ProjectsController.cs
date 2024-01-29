@@ -70,7 +70,8 @@ namespace RiskDashBoard.Controllers
                 project.Users = new List<User> { userOwner };        
                 project.Phases = new List<Phase> { new() {
                     PhaseTypes = new List<PhaseType> { phaseType },
-                    IsCurrentPhase = true
+                    IsCurrentPhase = true,
+                    IterationNumber = 1
                     },
                 };
                 project.HistoricPhases = new List<HistoricPhase> { new(){
@@ -80,7 +81,8 @@ namespace RiskDashBoard.Controllers
                             Date = DateTime.UtcNow,
                             UserId = userId,
                             UserName = userOwner.UserName,
-                            IsBack = false
+                            IsBack = false,
+                            IterationPhaseNumber = 1
                         } 
                 };
 

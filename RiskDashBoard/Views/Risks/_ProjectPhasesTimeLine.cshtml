@@ -204,7 +204,7 @@
     <ul class="timeline" style="margin-top:5px">
         @foreach (var historic in Model.Select((value, i) => new {i, value}))
         {
-            <li class="@(historic.i % 2 == 0 ? "timeline-inverted":"")">
+            <li class="@(historic.value.IsBack ? "":"timeline-inverted")">
                 <div class="timeline-badge @(historic.value.DecissionId == 1 ? "success" : historic.value.DecissionId == 2 ? "primary" : historic.value.DecissionId == 3 ? "warning" : "dark")"><i class="glyphicon glyphicon-check"></i></div>
                 <div class="timeline-panel">
                     <div class="timeline-heading">
@@ -219,6 +219,7 @@
                             @historic.value.CurrentPhaseType
                         </h4>
                         <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> @historic.value.HumanizedDate ago</small></p>
+                        <p><span> - Iteration number: @historic.value.IterationPhaseNumber </span></p>
                         <span class="badge rounded-pill @(historic.value.ProposalRiskDecission == (int)RiskTypeEnum.Acceptable ? "bg-success":
                         historic.value.ProposalRiskDecission == (int)RiskTypeEnum.Addressable ? "bg-primary":
                         historic.value.ProposalRiskDecission == (int)RiskTypeEnum.Unaddressable  ? "bg-warning":"bg-secondary")"> The decission proposal was: @historic.value.DecissionProposalDescription</span>

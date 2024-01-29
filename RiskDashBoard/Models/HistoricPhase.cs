@@ -19,6 +19,7 @@ namespace RiskDashBoard.Models
         public bool IsBack { get; set; }
         public int DecissionId { get; set; }
         public int ProposalRiskDecission {  get; set; }
+        public int IterationPhaseNumber { get; set; }
 
         [NotMapped]
         public string HumanizedDate => (DateTime.Now - Date).Value.Humanize(culture: new CultureInfo("en-En"));
