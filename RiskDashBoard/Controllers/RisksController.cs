@@ -4,6 +4,7 @@ using RiskDashBoard.Context;
 using RiskDashBoard.Models;
 using RiskDashBoard.Models.ViewModels;
 using RiskDashBoard.Resources;
+using static RiskDashBoard.Resources.StaticInfo;
 
 namespace RiskDashBoard.Controllers
 {
@@ -209,10 +210,10 @@ namespace RiskDashBoard.Controllers
 
             if (phase != null && phase.phaseSelected.Risks != null)
             {
-                low = phase.phaseSelected.Risks.Count(r => r.RiskLevel  == (int)StaticInfo.RiskLevelEnum.LOW);
-                medium = phase.phaseSelected.Risks.Count(r => r.RiskLevel == (int)StaticInfo.RiskLevelEnum.MEDIUM);
-                high = phase.phaseSelected.Risks.Count(r => r.RiskLevel == (int)StaticInfo.RiskLevelEnum.HIGH);
-                blocker = phase.phaseSelected.Risks.Count(r => r.RiskLevel == (int)StaticInfo.RiskLevelEnum.BLOCKER);
+                low = phase.phaseSelected.Risks.Count(r => r.RiskLevel  == (int)RiskLevelEnum.LOW);
+                medium = phase.phaseSelected.Risks.Count(r => r.RiskLevel == (int)RiskLevelEnum.MEDIUM);
+                high = phase.phaseSelected.Risks.Count(r => r.RiskLevel == (int)RiskLevelEnum.HIGH);
+                blocker = phase.phaseSelected.Risks.Count(r => r.RiskLevel == (int)RiskLevelEnum.BLOCKER);
 
                 var phaseViewModel = new PhaseViewModel
                 {
@@ -239,12 +240,16 @@ namespace RiskDashBoard.Controllers
                     phaseViewModel.IsOperationPhaseEnabled = false;
                 }
 
-                phaseViewModel.RiskTypeDecission = blocker >= 1 ? (int)RiskTypeEnum.Negligible : 
-                    high > 5 ? (int)RiskTypeEnum.Unaddressable : 
-                    medium >= 5 ? (int)RiskTypeEnum.Addressable : 
-                    (int)RiskTypeEnum.Acceptable;
+                phaseViewModel.EvaluationPhase = blocker >= 1 ? RiskLevelEvaluationTypeEnum.Unaddressable.ToString() : 
+                    high >= 5 ? RiskLevelEvaluationTypeEnum.Addressable.ToString() : 
+                    medium >= 5 ? RiskLevelEvaluationTypeEnum.Acceptable.ToString() : 
+                    RiskLevelEvaluationTypeEnum.Negligible.ToString();
 
-                phaseViewModel.ProposalRiskDecission = ((RiskTypeEnum)phaseViewModel.RiskTypeDecission).ToString();
+                phaseViewModel.ProposalRiskDecission = phaseViewModel.EvaluationPhase ==
+                    RiskLevelEvaluationTypeEnum.Unaddressable.ToString() ? (int)PhaseDecissionProposalTypeEnum.Discontinue :
+                    phaseViewModel.EvaluationPhase ==
+                    RiskLevelEvaluationTypeEnum.Addressable.ToString() ? (int)PhaseDecissionProposalTypeEnum.GoBack :
+                     (int)PhaseDecissionProposalTypeEnum.GoForward;
 
                 return PartialView("_ValidatePhase", phaseViewModel);
             }
@@ -313,7 +318,7 @@ namespace RiskDashBoard.Controllers
             }
         }
      
-        public async Task<IActionResult> NextPhase(int id, int idProject,bool checkFoundations, bool checkDevelopment, bool checkOperation, string comments, int decissionId, string proposalRiskDecission)
+        public async Task<IActionResult> NextPhase(int id, int idProject,bool checkFoundations, bool checkDevelopment, bool checkOperation, string comments, int proposalRiskDecission, string riskEvaluation)
         {
             var UserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
             var UserName = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserName.ToString());
@@ -326,8 +331,9 @@ namespace RiskDashBoard.Controllers
                 UserId = int.Parse(UserId),
                 UserName = UserName,
                 Comments = comments,
-                DecissionId = decissionId,
-                ProposalRiskDecission = (int)(RiskTypeEnum)Enum.Parse(typeof(RiskTypeEnum), proposalRiskDecission)
+                DecissionId = (int)PhaseDecissionProposalTypeEnum.GoForward,
+                PhaseRiskEvaluation = (int)(RiskLevelEvaluationTypeEnum)Enum.Parse(typeof(RiskLevelEvaluationTypeEnum), riskEvaluation),
+                ProposalRiskDecission = proposalRiskDecission
             };
             
 
@@ -384,7 +390,7 @@ namespace RiskDashBoard.Controllers
             return RedirectToAction("GetPhasesAndRiskByProject", "Risks", new { id = idProject });
         }
 
-        public async Task<IActionResult> BackPhase(int id, int idProject, string comments, int decissionId, string proposalRiskDecission)
+        public async Task<IActionResult> BackPhase(int id, int idProject, string comments, int proposalRiskDecission, string riskEvaluation)
         {
             var project = await _context.Projects.Include(p => p.HistoricPhases).Include(p => p.Phases).ThenInclude(p => p.PhaseTypes).Include(p=> p.Phases).ThenInclude(ph => ph.Risks).FirstOrDefaultAsync(p => p.ProjectId == idProject).ConfigureAwait(false);
             var phase = project.Phases.OrderBy(ph => ph.PhaseId).Select((p, i) => new { phase = p, index = i }).FirstOrDefault(p => p.phase.PhaseId == id);
@@ -402,14 +408,14 @@ namespace RiskDashBoard.Controllers
                     UserId = int.Parse(UserId),
                     UserName = UserName,
                     Comments = comments,
-                    DecissionId = decissionId,
-                    ProposalRiskDecission = (int)(RiskTypeEnum)Enum.Parse(typeof(RiskTypeEnum), proposalRiskDecission),
-                    IterationPhaseNumber = phase.phase.IterationNumber
+                    DecissionId = (int)PhaseDecissionProposalTypeEnum.GoBack,
+                    PreviousPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList()),
+                    PhaseRiskEvaluation = (int)(RiskLevelEvaluationTypeEnum)Enum.Parse(typeof(RiskLevelEvaluationTypeEnum), riskEvaluation),
+                    ProposalRiskDecission = proposalRiskDecission,
                 };
-
-                newHistoricProject.PreviousPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
                 project.Phases.First(p => p.IsCurrentPhase).IsCurrentPhase = false;
                 project.Phases.ElementAt(phase.index - 1).IsCurrentPhase = true;
+                newHistoricProject.IterationPhaseNumber = project.Phases.ElementAt(phase.index - 1).IterationNumber;
                 newHistoricProject.CurrentPhaseType = string.Join(",", project.Phases.First(p => p.IsCurrentPhase).PhaseTypes.Select(pt => pt.PhaseTypeNameDescription).ToList());
                 project.HistoricPhases.Add(newHistoricProject);
 

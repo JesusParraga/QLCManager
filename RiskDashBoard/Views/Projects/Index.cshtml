@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<RiskDashBoard.Models.Project>
+@using RiskDashBoard.Resources
 
 @{
     ViewData["Title"] = "Index";
@@ -20,8 +21,8 @@
 
     <div class="row">
     @foreach (var item in Model) {
-            <div class="card text-dark bg-light mb-3" style="max-width: 18rem; margin-left: 10px">
-                <a asp-controller="Risks" asp-action="GetPhasesWithRisks" asp-route-id="@item.ProjectId" style="padding-top:15px;">
+            <div class="@(item.ProjectStatus == (int)StaticInfo.ProjectSatusEnum.Open ?  "card text-dark bg-light mb-3" :"card text-white bg-secondary mb-3")" style="max-width: 18rem; margin-left: 10px">
+                <a asp-controller="Risks" asp-action="GetPhasesWithRisks" asp-route-id="@item.ProjectId" style="padding-top:15px; @(item.ProjectStatus == (int)StaticInfo.ProjectSatusEnum.Open ? "":"color:aliceblue")">
 
                     @foreach (var phaseType in @item.Phases?.FirstOrDefault(x => x.IsCurrentPhase)?.PhaseTypes)
                     {
@@ -34,9 +35,9 @@
                     </div>
                 </a>
                 <div class="card-footer" style="margin-left:-12px; margin-right:-12px">
-                    <a asp-action="Edit" asp-route-id="@item.ProjectId"><i class="fa-solid fa-pencil"></i></a>
-                    <a asp-action="Details" asp-route-id="@item.ProjectId"><i class="fa-solid fa-circle-info"></i></a>
-                    <a asp-action="Delete" asp-route-id="@item.ProjectId"><i class="fas fa-trash"></i></a>
+                    <a asp-action="Edit" asp-route-id="@item.ProjectId" style="@(item.ProjectStatus == (int)StaticInfo.ProjectSatusEnum.Open ? "":"color:aliceblue")"><i class="fa-solid fa-pencil"></i></a>
+                    <a asp-action="Details" asp-route-id="@item.ProjectId" style="@(item.ProjectStatus == (int)StaticInfo.ProjectSatusEnum.Open ? "":"color:aliceblue")"><i class="fa-solid fa-circle-info"></i></a>
+                    <a asp-action="Delete" asp-route-id="@item.ProjectId" style="@(item.ProjectStatus == (int)StaticInfo.ProjectSatusEnum.Open ? "":"color:aliceblue")"><i class="fas fa-trash"></i></a>
                 </div>
             </div>
     }

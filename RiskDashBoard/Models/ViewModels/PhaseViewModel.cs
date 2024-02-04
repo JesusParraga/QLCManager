@@ -1,11 +1,13 @@
-﻿namespace RiskDashBoard.Models.ViewModels
+﻿using static RiskDashBoard.Resources.StaticInfo;
+
+namespace RiskDashBoard.Models.ViewModels
 {
     public class PhaseViewModel
     {
         public int PhaseId { get; set; }
         public bool IsCurrentPhase { get; set; }
         public int ProjectId { get; set; }
-        public int RiskTypeDecission { get; set; }
+        public string? EvaluationPhase{ get; set; }
         public List<PhaseType> PhaseTypes { get; set; } 
         public int NumberLowRisk { get; set; }
         public int NumberMediumRisk { get; set; }
@@ -21,6 +23,8 @@
         public bool IsFoundationsPhaseEnabled { get; set; }
         public bool IsDevelopmentPhaseEnabled { get; set; }
         public bool IsOperationPhaseEnabled { get; set; }
-        public string? ProposalRiskDecission { get; set; }
+        public int ProposalRiskDecission { get; set; }
+
+        public string? ProposalRiskDecissionDescription => GetDescriptionAttributeEnum((PhaseDecissionProposalTypeEnum)ProposalRiskDecission);
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace RiskDashBoard.Resources
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace RiskDashBoard.Resources
 {
     public static class StaticInfo
     {
@@ -45,6 +48,47 @@
         {
             PENDING = 0,
             RESOLVED = 1
+        }
+
+        public enum RiskLevelEvaluationTypeEnum
+        {
+            Acceptable = 1,
+            Addressable = 2,
+            Unaddressable = 3,
+            Negligible = 4
+        }
+
+        public enum PhaseDecissionProposalTypeEnum
+        {
+            [Description("Go forward")]
+            GoForward = 1,
+            [Description("Go back")]
+            GoBack = 2,
+            [Description("Discontinue")]
+            Discontinue = 3
+        }
+
+        public enum ProjectSatusEnum
+        {
+            Open = 0,
+            Close = 1
+        }
+
+        public static string GetDescriptionAttributeEnum(Enum valorEnum)
+        {
+            try
+            {
+                var tipoEnum = valorEnum.GetType();
+                var nombreCampo = Enum.GetName(tipoEnum, valorEnum);
+
+                var campo = tipoEnum.GetField(nombreCampo);
+                var atributo = (DescriptionAttribute)Attribute.GetCustomAttribute(campo, typeof(DescriptionAttribute));
+                return atributo?.Description ?? valorEnum.ToString();
+            }
+            catch (Exception)
+            {
+                return valorEnum.ToString();
+            }    
         }
     }
 }

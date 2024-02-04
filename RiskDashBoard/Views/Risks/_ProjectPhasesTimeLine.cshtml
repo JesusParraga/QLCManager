@@ -1,4 +1,4 @@
-﻿@using RiskDashBoard.Resources
+﻿@using static RiskDashBoard.Resources.StaticInfo
 @model IEnumerable<RiskDashBoard.Models.HistoricPhase>
 
 <style>
@@ -188,27 +188,17 @@
 </style>
 
 <div class="container">
-@*     <div class="page-header">
-        <h1 id="timeline">Timeline</h1>
-    </div> *@
-
-    <div class="row" style="margin-top:10px; text-align:center">
-        <span class="col-2">Decission taken:</span>
-        <span class="col-1 badge rounded-pill bg-secondary" style="margin-right: 5px">Negligible</span>
-        <span class="col-1 badge rounded-pill bg-warning" style="margin-right: 5px">Unaddressable</span>
-        <span class="col-1 badge rounded-pill bg-primary" style="margin-right: 5px">Addressable</span>
-        <span class="col-1 badge rounded-pill bg-success" style="margin-right: 5px">Acceptable</span>
-    </div>
 
 
     <ul class="timeline" style="margin-top:5px">
         @foreach (var historic in Model.Select((value, i) => new {i, value}))
         {
             <li class="@(historic.value.IsBack ? "":"timeline-inverted")">
-                <div class="timeline-badge @(historic.value.DecissionId == 1 ? "success" : historic.value.DecissionId == 2 ? "primary" : historic.value.DecissionId == 3 ? "warning" : "dark")"><i class="glyphicon glyphicon-check"></i></div>
+                <div class="timeline-badge dark"><i class="glyphicon glyphicon-check"></i></div>
                 <div class="timeline-panel">
                     <div class="timeline-heading">
-                        <h4 class="timeline-title">@historic.value.PreviousPhaseType @if (historic.value.IsBack)
+                        <h4 class="timeline-title"> Iteration number: @historic.value.IterationPhaseNumber</h4>
+                        <h6 class="timeline-title">@historic.value.PreviousPhaseType @if (historic.value.IsBack)
                             {
                                 <i class="fa-solid fa-caret-left"></i>
                             }
@@ -217,12 +207,15 @@
                                 <i class="fa-solid fa-caret-right"></i>
                             }
                             @historic.value.CurrentPhaseType
-                        </h4>
+                        </h6>
                         <p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> @historic.value.HumanizedDate ago</small></p>
-                        <p><span> - Iteration number: @historic.value.IterationPhaseNumber </span></p>
-                        <span class="badge rounded-pill @(historic.value.ProposalRiskDecission == (int)RiskTypeEnum.Acceptable ? "bg-success":
-                        historic.value.ProposalRiskDecission == (int)RiskTypeEnum.Addressable ? "bg-primary":
-                        historic.value.ProposalRiskDecission == (int)RiskTypeEnum.Unaddressable  ? "bg-warning":"bg-secondary")"> The decission proposal was: @historic.value.DecissionProposalDescription</span>
+                        <p>
+                            <span class="badge rounded-pill 
+                            @(historic.value.PhaseRiskEvaluation == (int)RiskLevelEvaluationTypeEnum.Unaddressable ? "bg-danger":
+                            historic.value.ProposalRiskDecission == (int)RiskLevelEvaluationTypeEnum.Addressable ? "bg-warning": "bg-success")"> 
+                            The phase evaluatio was: @historic.value.PhaseRiskEvaluationDescription</span>
+                        </p>
+                        <p><span>The decision proposal was: <span style="font-weight:bold">@historic.value.DecissionProposalDescription</span></span></p>
                     </div>
                     <div class="timeline-body" style="margin-top:5px">
                         <p>@historic.value.Comments</p>

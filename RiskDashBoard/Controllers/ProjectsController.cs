@@ -4,6 +4,7 @@ using RiskDashBoard.Context;
 using RiskDashBoard.Models;
 using RiskDashBoard.Models.ViewModels;
 using RiskDashBoard.Resources;
+using static RiskDashBoard.Resources.StaticInfo;
 
 namespace RiskDashBoard.Controllers
 {
@@ -117,7 +118,7 @@ namespace RiskDashBoard.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProjectId,ProjectName,ProjectCreateDate,ProjectLastUpdateDate")] Project project)
+        public async Task<IActionResult> Edit(int id, [Bind("ProjectId,ProjectName,ProjectCreateDate,ProjectLastUpdateDate, ProjectStatus")] Project project)
         {
             if (id != project.ProjectId)
             {
@@ -237,6 +238,25 @@ namespace RiskDashBoard.Controllers
             }
 
             return PartialView("_ViewUserProject", userProjectViewModel);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CloseProject(int idProject)
+        {
+            var project = await _context.Projects.FirstOrDefaultAsync(x => x.ProjectId == idProject);
+
+            if (project != null)
+            {
+                project.ProjectStatus = (int)ProjectSatusEnum.Close;
+                _context.Update(project);
+                await _context.SaveChangesAsync();
+
+                string stringUserId = HttpContext?.Session?.GetString(SessionVariables.SessionEnum.SessionKeyUserId.ToString());
+                int.TryParse(stringUserId, out var userId);
+                var projects = await _context.Projects.Include(x => x.Phases).ThenInclude(p => p.PhaseTypes).Where(x => x.Users.Any(x => x.UserId == userId)).ToListAsync();
+            }
+
+            return Json(new { redirectTo = Url.Action("Index", "Projects") });
         }
 
         private async Task<List<UserProjectViewModel>> UsersByProject(Project project)

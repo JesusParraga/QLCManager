@@ -1,7 +1,7 @@
 ﻿using Humanizer;
-using RiskDashBoard.Resources;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
+using static RiskDashBoard.Resources.StaticInfo;
 
 namespace RiskDashBoard.Models
 {
@@ -19,15 +19,19 @@ namespace RiskDashBoard.Models
         public bool IsBack { get; set; }
         public int DecissionId { get; set; }
         public int ProposalRiskDecission {  get; set; }
+        public int PhaseRiskEvaluation { get; set; }
         public int IterationPhaseNumber { get; set; }
 
         [NotMapped]
         public string HumanizedDate => (DateTime.Now - Date).Value.Humanize(culture: new CultureInfo("en-En"));
 
         [NotMapped]
-        public string DecissionDescription => ((RiskTypeEnum)DecissionId).ToString();
+        public string DecissionDescription => GetDescriptionAttributeEnum((PhaseDecissionProposalTypeEnum)DecissionId);
 
         [NotMapped]
-        public string DecissionProposalDescription => ((RiskTypeEnum)ProposalRiskDecission).ToString();
+        public string DecissionProposalDescription => GetDescriptionAttributeEnum((PhaseDecissionProposalTypeEnum)ProposalRiskDecission);
+
+        [NotMapped]
+        public string PhaseRiskEvaluationDescription => ((RiskLevelEvaluationTypeEnum)PhaseRiskEvaluation).ToString();
     }
 }

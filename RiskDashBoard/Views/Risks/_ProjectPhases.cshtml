@@ -42,10 +42,10 @@
                         </a>
                     </h5>
                 </div>
-                <div id="@phase.value.PhaseId" class="collapse @(phase.value.IsCurrentPhase ? " show" :"")" aria-labelledby="heading-example">
+                <div id=@(phase.value.IsCurrentPhase ? "currentPhaseSelected": @phase.value.PhaseId) class="collapse @(phase.value.IsCurrentPhase ? " show" :"")" aria-labelledby="heading-example">
                     <div class="card-body">
                         <div class ="row" style="margin-bottom:10px">
-                            @if (phase.value.IsCurrentPhase)
+                            @if (phase.value.IsCurrentPhase && phase.value.Project.ProjectStatus != 1)
                             {
                                 <div class="col-2">
                                     <a class="btn btn-outline-info mx-1" onclick="DislplayValidatePhase(@phase.value.PhaseId, @phase.value.ProjectId)"><i class="fa-solid fa-diagram-next"></i></a>
@@ -60,7 +60,7 @@
                         <div class="row">
                             @foreach (var risk in phase?.value?.Risks)
                             {
-                                var border = risk.Resolved ? "border-secondary" : risk.RiskLevel == (int)RiskLevelEnum.BLOCKER ? "border-danger" : risk.RiskLevel == (int)RiskLevelEnum.HIGH ? "border-high" : risk.RiskLevel == (int)RiskLevelEnum.MEDIUM ? "border-warning" : "border-success";
+                                var border = risk.Resolved ? "bg-light mb-3" : risk.RiskLevel == (int)RiskLevelEnum.BLOCKER ? "border-danger" : risk.RiskLevel == (int)RiskLevelEnum.HIGH ? "border-high" : risk.RiskLevel == (int)RiskLevelEnum.MEDIUM ? "border-warning" : "border-success";
                                 <div class="card @(border) mb-3 border-2" style="max-width: 18rem; margin-left: 20px;">
                                     <div class="card-body">
                                         <h5 class="card-title">@risk.RiskId - @risk.RiskName</h5>
@@ -92,6 +92,10 @@
 
 
 <script>
+    $(document).ready(function () {
+        $('#currentPhaseSelected')[0].scrollIntoView({ behavior: 'smooth' });
+    });
+
     function OrderTask(element) {
         LoadProjectPhasesOrder(element.checked);
     };

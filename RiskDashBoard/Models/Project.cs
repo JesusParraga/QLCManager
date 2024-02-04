@@ -11,6 +11,9 @@ namespace RiskDashBoard.Models
         [DisplayName("Title")]
         public string? ProjectName { get; set; }
         [Required]
+        [DisplayName("Project status")]
+        public int ProjectStatus { get; set; }
+        [Required]
         [DisplayName("Create date")]
         public DateTime ProjectCreateDate { get; set; }
         [Required]

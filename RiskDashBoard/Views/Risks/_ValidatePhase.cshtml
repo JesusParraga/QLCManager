@@ -41,8 +41,7 @@
             <h5 class="card-title">
                 Phase analysis
             </h5>
-            <p class="card-text">After analysis, in the current situation of the phase, our proposal, base in the risk list that you have, is: <span id="spanProposalRiskDecission" style="font-weight: bold">@Model.ProposalRiskDecission</span> </p>
-            @Html.DropDownListFor(model => model.RiskTypeDecission, Enum.GetValues(typeof(RiskTypeEnum)).Cast<RiskTypeEnum>().Select(r => new SelectListItem { Text = r.ToString(), Value=((int)r).ToString()}), new { @class = "form-control", @id = "dropDownDecission" })
+            <p class="card-text">After analysis, in the current situation of the phase the risk evaluation seems "<span id="spanProposalRiskEvaluation" style="font-weight: bold">@Model.EvaluationPhase</span>", in this case our proposal, is: "<span style="font-weight: bold">@Model.ProposalRiskDecissionDescription</span>" </p>
         </div>
     </div>
     <div class="row" style="margin-left:10px">
@@ -83,15 +82,19 @@
         }
     </div>
     <div class="row" style="margin-left:5px; margin-right:5px; margin-top: 10px">
-        <textarea id="phaseComments" class="form-control"></textarea>
+        <textarea id="phaseComments" class="form-control" style="min-height: 210px"></textarea>
     </div>
     <div class="row">
         <div class="form-group" style="margin-top:15px; text-align:center">
             <button type="button" id="@Model.PhaseId" onclick="BackPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-backward-step" style="margin-right:5px"></i>Previous phase</button>
             <button type="button" id="@Model.PhaseId" onclick="NextPhase(@Model.PhaseId, @Model.ProjectId)" class="btn btn-">Next phase<i class="fa-solid fa-forward-step" style="margin-left:5px"></i></button>
         </div>
+        <div class="form-group" style="margin-top:5px; text-align:center">
+            <button type="button" id="@Model.PhaseId" onclick="CloseProject(@Model.ProjectId)" class="btn btn-"><i class="fa-solid fa-circle-xmark" style="margin-right:5px"></i>Close project</button>
+        </div>
     </div>
 </div>
+<input asp-for="@Model.ProposalRiskDecission" type="hidden" id="spanProposalRiskDecission" />
 
 
 <script>
@@ -101,8 +104,8 @@
         var checkDevelopment = $('#flexSwitchCheckDevelopment').is(':checked');
         var checkOperation = $('#flexSwitchCheckOperation').is(':checked');
         var phaseComments = $('#phaseComments').val();
-        var decissionSelectedId = $('#dropDownDecission').val();
-        var proposalRiskDecission = $('#spanProposalRiskDecission').text();
+        var riskEvaluation = $('#spanProposalRiskEvaluation').text();
+        var proposalRiskDecission = $('#spanProposalRiskDecission').val();
 
 
         $.ajax({
@@ -115,12 +118,11 @@
                 checkDevelopment: checkDevelopment,
                 checkOperation: checkOperation,
                 comments: phaseComments,
-                decissionId: decissionSelectedId,
-                proposalRiskDecission: proposalRiskDecission
+                proposalRiskDecission: proposalRiskDecission,
+                riskEvaluation: riskEvaluation
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');
-                //$("#projectPhases").html(data);
                 RefreshPhaseTimeLinePage();
             }
         });
@@ -129,9 +131,8 @@
     function BackPhase(PhaseId, ProjectId) {
 
         var phaseComments = $('#phaseComments').val();
-        var decissionSelectedId = $('#dropDownDecission').val();
-        var proposalRiskDecission = $('#spanProposalRiskDecission').text();
-        console.log
+        var proposalRiskDecission = $('#spanProposalRiskDecission').val();
+        var riskEvaluation = $('#spanProposalRiskEvaluation').text();
 
         $.ajax({
             url: "/Risks/BackPhase",
@@ -140,14 +141,27 @@
                 id: PhaseId,
                 idProject: ProjectId,
                 comments: phaseComments,
-                decissionId: decissionSelectedId,
-                proposalRiskDecission: proposalRiskDecission
+                proposalRiskDecission: proposalRiskDecission,
+                riskEvaluation: riskEvaluation
+
             },
             success: function (data) {
                 $('#validatePhaseModal').modal('hide');
-                //$("#projectPhases").html(data);
                 LoadProjectPhases();
                 LoadProjectHistoric();
+            }
+        });
+    };
+
+    function CloseProject(ProjectId) {
+        $.ajax({
+            url: "/Projects/CloseProject",
+            type: 'POST',
+            data: {
+                idProject: ProjectId,
+            },
+            success: function (data) {
+                window.location.href = data.redirectTo;
             }
         });
     };
