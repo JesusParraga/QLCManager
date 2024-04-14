@@ -366,6 +366,7 @@ namespace RiskDashBoard.Controllers
                         ProjectId = idProject,
                         IterationNumber = phase.index + 1
                     });
+                    _context.SaveChanges();
                 }
                 else
                 {

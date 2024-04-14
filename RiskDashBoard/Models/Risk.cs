@@ -76,7 +76,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.LOW;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.MEDIUM;
-                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.MEDIUM;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROPHIC) return (int)RiskLevelEnum.MEDIUM;
             }
 
             if (RiskProbability == (int)RiskProbabilityEnum.UNLIKELY)
@@ -85,7 +85,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.LOW;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.MEDIUM;
-                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.HIGH;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROPHIC) return (int)RiskLevelEnum.HIGH;
             }
 
             if (RiskProbability == (int)RiskProbabilityEnum.POSSIBLE)
@@ -94,7 +94,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.HIGH;
-                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.HIGH;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROPHIC) return (int)RiskLevelEnum.HIGH;
             }
 
             if (RiskProbability == (int)RiskProbabilityEnum.LIKELY)
@@ -103,7 +103,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.HIGH;
                 if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.HIGH;
-                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.BLOCKER;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROPHIC) return (int)RiskLevelEnum.BLOCKER;
             }
 
             if (RiskProbability == (int)RiskProbabilityEnum.CERTAIN)
@@ -112,7 +112,7 @@ namespace RiskDashBoard.Models
                 if (RiskImpact == (int)RiskImpactEnum.MINOR) return (int)RiskLevelEnum.MEDIUM;
                 if (RiskImpact == (int)RiskImpactEnum.MODERATE) return (int)RiskLevelEnum.HIGH;
                 if (RiskImpact == (int)RiskImpactEnum.MAYOR) return (int)RiskLevelEnum.BLOCKER;
-                if (RiskImpact == (int)RiskImpactEnum.CATASTROHIC) return (int)RiskLevelEnum.BLOCKER;
+                if (RiskImpact == (int)RiskImpactEnum.CATASTROPHIC) return (int)RiskLevelEnum.BLOCKER;
             }
 
             return (int)RiskLevelEnum.LOW;

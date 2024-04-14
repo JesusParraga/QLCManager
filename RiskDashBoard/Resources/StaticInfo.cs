@@ -32,7 +32,7 @@ namespace RiskDashBoard.Resources
             MINOR = 2,
             MODERATE = 3,
             MAYOR = 4,
-            CATASTROHIC = 5
+            CATASTROPHIC = 5
         }
 
         public enum RiskLevelEnum
